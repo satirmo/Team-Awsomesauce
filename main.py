@@ -12,9 +12,7 @@ from constants import decisions
 
 # MAIN : will be a loop of decision making.
 
-x = decisions()
-print (x.TURN_LEFT)
-
-#while True:
+while True:
     # This will be leaving the cozmo default driving straight until
     # getInfo returns something important
+    print ("Things should be here.")

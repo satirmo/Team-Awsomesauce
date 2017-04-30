@@ -18,8 +18,8 @@ class cozmoDrives:
     def __init__(self, a_robot: cozmo.robot.Robot):
         # Constants
         self._CONSTANTS = CONST()
-        self.MAX_SPEED = self._CONSTANTS.getHighSpeedLimit()
-        self.MIN_SPEED = self._CONSTANTS.getLowSpeedLimit()
+        self.MAX_SPEED = self._CONSTANTS.MAX_LIMIT
+        self.MIN_SPEED = self._CONSTANTS.MIN_LIMIT
         self.LEFT = 0
         self.RIGHT = 1
 
