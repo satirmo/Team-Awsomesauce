@@ -30,9 +30,13 @@ class CozmoObstacleCheck:
     ### you don't use the incorrect values within a new comparison later on. --Amanda (hue, hue, hue)
     compareSignList=[]
 
-    # directions returned to cozmo. Perhaps this could be a tuple?
-    # it will include the sign function that it calls, and
-    # another variable to denote another action
+    # directions returned to cozmo. Comes as 2 tuples in a list.
+    # tuple 1: adjust wheel to veer the Cozmo (stay in the lines)
+    # tuple 2: which function to call the Cozmo, and the distance needed (if any)
+    # [(wheel, speed change as a percent),(function, distance if needed)]
+    # example [(left, 0.85),(stopSign,20)]
+    # note: wheel speed is a percent instead of absolute because Cozmos will
+    #       be traveling at different speeds
     directionList=[]
 
     # -------
@@ -40,14 +44,14 @@ class CozmoObstacleCheck:
     def __init__(self):
         pass
 
-    def sortSigns(self):
+    def sortSigns(self,signToSort):
         # sort by the closest obstacle distance
         # ensure that obstacle type is not lost when distance is sorted
 
         #return sorted obstacle tuple
         pass
 
-    def cleanSigns(self):
+    def cleanSigns(self,signToCut):
         # get size of tuples being sent
         # run through all obstacles (assumed they are sorted)
         # discard obstacles if they are > set distance
@@ -67,12 +71,17 @@ class CozmoObstacleCheck:
 
     def interpretSigns(self):
         # call Tomas' openCV class to take in his return input of current signs
+        # ----need Tomas' call name to get signs
+        #currentSignList=[[ (sign_1, dist_1), (sign_2, dist_2), ..., (sign_n, dist_n) ],(leftDist, rightDist, isBehindCozmo)]
+        currentSignList=[[(0,100),(1,100),(2,100),(3,50),(4,100),(5,100),(6,20),(7,100),(8,100)],[(1,1)]]
 
         # run sortSigns to sort by the distance of seen objects
+        self.sortSigns(currentSignList)
 
         # run cleanSigns to focus on what's needed
+        self.cleanSigns(currentSignList)
 
-        pass
+        return
 
     def viewLast(self):
         # retrieves the data captured in storeLast
@@ -103,21 +112,16 @@ class CozmoObstacleCheck:
         # updates the object distance array
         # positionUpdated = the list position to be updated
         objectDistance[positionUpdated]=newValue
-        pass
-
-
-    def returnDirections(self):
-        # if you see a stop sign and then it goes away
-        # you'll know to turn
-        pass
+        return
 
 
     # this is the main function of the class
     # it calls all the other functions and
     # returns the directions for the Cozmo
-    def logicBomb(self):
+    # previously titled "logicBomb"
+    def returnDirections(self):
         # run interpretSigns
-
+        self.interpretSigns()
         # run compareLast
 
         # call storeLast to save old signs
@@ -155,6 +159,7 @@ class CozmoObstacleCheck:
         pass
 
     def testThis(self):
+        self.returnDirections()
         print("Ok, tested")
         return
 
@@ -162,6 +167,7 @@ class CozmoObstacleCheck:
 #main
 one=CozmoObstacleCheck()
 one.testThis()
-print(one.objectDistance[2])
+# need to rejog my memory on updating and saving python class variables. 
+#print(one.currentSignList[0][0])
 
 exit()
