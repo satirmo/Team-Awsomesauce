@@ -49,7 +49,7 @@ class CozmoObstacleCheck:
         # ensure that obstacle type is not lost when distance is sorted
 
         #return sorted obstacle tuple
-        pass
+        return
 
     def cleanSigns(self,signToCut):
         # get size of tuples being sent
@@ -57,7 +57,7 @@ class CozmoObstacleCheck:
         # discard obstacles if they are > set distance
 
         # return list of valid obstacles.
-        pass
+        return
 
     def storeLast(self):
         # store the last set of sign data for comparison
@@ -67,21 +67,21 @@ class CozmoObstacleCheck:
         # if sign data is wiped (after turn, etc), store data
 
         # if previous data present,
-        pass
+        return
 
     def interpretSigns(self):
         # call Tomas' openCV class to take in his return input of current signs
         # ----need Tomas' call name to get signs
         #currentSignList=[[ (sign_1, dist_1), (sign_2, dist_2), ..., (sign_n, dist_n) ],(leftDist, rightDist, isBehindCozmo)]
-        currentSignList=[[(0,100),(1,100),(2,100),(3,50),(4,100),(5,100),(6,20),(7,100),(8,100)],[(1,1)]]
+        self.currentSignList=[[(0,100),(1,100),(2,100),(3,50),(4,100),(5,100),(6,20),(7,100),(8,100)],[1,1]]
 
         # run sortSigns to sort by the distance of seen objects
-        self.sortSigns(currentSignList)
+        self.sortSigns(self.currentSignList)
 
         # run cleanSigns to focus on what's needed
-        self.cleanSigns(currentSignList)
+        self.cleanSigns(self.currentSignList)
 
-        return
+        return self.currentSignList
 
     def viewLast(self):
         # retrieves the data captured in storeLast
@@ -111,7 +111,7 @@ class CozmoObstacleCheck:
     def objectDistanceUpdate(self, positionUpdated, newValue):
         # updates the object distance array
         # positionUpdated = the list position to be updated
-        objectDistance[positionUpdated]=newValue
+        self.objectDistance[positionUpdated]=newValue
         return
 
 
@@ -156,18 +156,20 @@ class CozmoObstacleCheck:
                 #
 
 
-        pass
+        return
 
+    # this is a test class that will be nuked as soon as this puppy is
+    # up and running with the correct logic.
     def testThis(self):
         self.returnDirections()
         print("Ok, tested")
-        return
+        return self.currentSignList
 
 
-#main
+# temp main used to test the class. 
 one=CozmoObstacleCheck()
-one.testThis()
-# need to rejog my memory on updating and saving python class variables. 
-#print(one.currentSignList[0][0])
+ourDirections=one.testThis()
+
+print(ourDirections)
 
 exit()
