@@ -15,7 +15,7 @@ from cozmo.util import degrees, distance_mm, speed_mmps, Speed
 
 
 class cozmoDrives:
-    def __init__(self, a_robot: cozmo.robot.Robot):
+    def __init__(self, a_robot):
         # Constants
         self._CONSTANTS = CONST()
         self.MAX_SPEED = self._CONSTANTS.MAX_LIMIT
@@ -50,6 +50,7 @@ class cozmoDrives:
     def setSpeed(self, left_wheel, right_wheel):
         l_wheel_speed = left_wheel
         r_wheel_speed = right_wheel
+        print (l_wheel_speed, r_wheel_speed)
         l_wheel_acc = l_wheel_speed
         r_wheel_acc = r_wheel_speed
         msg = _clad_to_engine_iface.DriveWheels(lwheel_speed_mmps=l_wheel_speed,
@@ -57,7 +58,7 @@ class cozmoDrives:
                                                 lwheel_accel_mmps2=l_wheel_acc,
                                                 rwheel_accel_mmps2=r_wheel_acc)
         self.robot.conn.send_msg(msg)
-        if robot.are_wheels_moving == False:
+        if self.robot.are_wheels_moving == False:
             print("Error(?) : Speed unchanged / set to zero, please use setStop() instead.")
         else:
             print( "Cozmo Message :: Wheel Speed Updated.")
@@ -72,7 +73,7 @@ class cozmoDrives:
                                                 lwheel_accel_mmps2=l_wheel_acc,
                                                 rwheel_accel_mmps2=r_wheel_acc)
         self.robot.conn.send_msg(msg)
-        if robot.are_wheels_moving:
+        if self.robot.are_wheels_moving:
             print("Error : Wheels are currently moving, should have stopped..!?")
 
     # This function will act as an emergency stop with a Cozmo reaction
@@ -85,6 +86,3 @@ class cozmoDrives:
         # determine direction
         print ("Turn in road")
         # turn towards that direction
-
-
-#cozmo.run_program(cozmo_program)

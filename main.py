@@ -7,12 +7,22 @@
 # Current File : main.py
 
 import cozmo
+from time import sleep
 from cozmoDrives import cozmoDrives
 from constants import decisions
 
 # MAIN : will be a loop of decision making.
 
-while True:
-    # This will be leaving the cozmo default driving straight until
-    # getInfo returns something important
-    print ("Things should be here.")
+def cozmo_program(robot: cozmo.robot.Robot):
+    x = cozmoDrives(robot)
+    x.setSpeed(50.0, 50.0)
+    while True:
+        print ("keep going")
+        x.setSpeed(50.0, 50.0)
+        sleep(1)
+cozmo.run_program(cozmo_program)
+
+# while True:
+#     # This will be leaving the cozmo default driving straight until
+#     # getInfo returns something important
+#     print ("Things should be here.")
