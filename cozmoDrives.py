@@ -40,7 +40,7 @@ class cozmoDrives:
 
     # This will be information from John Atti
     def getInfo(self):
-        
+
         # Function call from John
         # Store the information
         # Retrieve the necessary information.
@@ -83,8 +83,8 @@ class cozmoDrives:
 
     def roadTurn (self, direction):
         # determine direction
-
+        print ("Turn in road")
         # turn towards that direction
 
 
-cozmo.run_program(cozmo_program)
+#cozmo.run_program(cozmo_program)

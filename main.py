@@ -8,9 +8,13 @@
 
 import cozmo
 from cozmoDrives import cozmoDrives
+from constants import decisions
 
 # MAIN : will be a loop of decision making.
 
-while True:
+x = decisions()
+print (x.TURN_LEFT)
+
+#while True:
     # This will be leaving the cozmo default driving straight until
     # getInfo returns something important
