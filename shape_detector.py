@@ -47,6 +47,42 @@ def isValidPentagon( hull ) :
 
     return False;
 
+def isValidSquare( hull ) :
+    hull.sort();
+
+    print( hull );
+
+    eps = 5;
+
+    lx = abs( hull[ 0 ][ 0 ] - hull[ 1 ][ 0 ] );
+    rx = abs( hull[ 2 ][ 0 ] - hull[ 3 ][ 0 ] );
+
+    ly = abs( hull[ 0 ][ 1 ] - hull[ 1 ][ 1 ] );
+    ry = abs( hull[ 2 ][ 1 ] - hull[ 3 ][ 1 ] );
+
+    print( lx, rx, ly, ry );
+
+    if abs( lx - rx ) > eps or abs( ly - ry ) > eps :
+        return False;
+
+    lxmid = int( ( hull[ 0 ][ 0 ] + hull[ 1 ][ 0 ] ) / 2 );
+    rxmid = int( ( hull[ 2 ][ 0 ] + hull[ 3 ][ 0 ] ) / 2 );
+
+    hull.sort( key = lambda x : x[ 1 ] );
+
+    lymid = int( ( hull[ 0 ][ 1 ] + hull[ 1 ][ 1 ] ) / 2 );
+    rymid = int( ( hull[ 2 ][ 1 ] + hull[ 3 ][ 1 ] ) / 2 );
+
+    print( hull );
+    print( lxmid, rxmid, lymid, rymid );
+
+    dx = abs( lxmid - rxmid );
+    dy = abs( lymid - rymid );
+
+    print( dx, dy );
+
+    return abs( dx - dy ) <= eps;
+
 def hullToList( hull ) :
     return [ ( vertex[ 0 ][ 0 ], vertex[ 0 ][ 1 ] ) for vertex in hull ];
 
@@ -64,7 +100,7 @@ def getSignReadings( img ) :
     maskedInvert = cv2.bitwise_not( masked );
 
     ret, thresh = cv2.threshold( maskedInvert, 35, 255, 1 );
-    cv2.imshow( "aksjdksja", thresh );
+    # cv2.imshow( "aksjdksja", thresh );
     contourImg, contours, hierarchy = cv2.findContours( thresh, 1, 2 );
 
     signs = [];
@@ -85,7 +121,7 @@ def getSignReadings( img ) :
             cv2.drawContours( img, [ hullVertices ], 0, ( 0, 255, 0 ), -1)
             signs.append( "triangle" );
 
-        elif sides == 4 :
+        elif sides == 4 and isValidSquare( hullToList( hullVertices ) ) :
             cv2.drawContours( img, [ hullVertices ], 0, ( 0, 0, 255 ), 3 );
             signs.append( "square" );
 
@@ -110,9 +146,9 @@ def getSignReadings( img ) :
 
 # Driver Code
 if __name__ == "__main__" :
-    for i in range( 20 ):
+    for i in range( 1, 20 ):
         print( "----------" );
-        name = 'backRoad' + str(i) + '.png'
+        name = 'cozmoRoad' + str(i) + '.png'
         img = cv2.imread( name );
         
         signReadings = getSignReadings( img );
