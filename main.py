@@ -15,10 +15,11 @@ from constants import decisions
 
 def cozmo_program(robot: cozmo.robot.Robot):
     x = cozmoDrives(robot)
-    x.setSpeed(50.0, 50.0)
+    x.setSpeed(50.0, 20.0)
+    robot.play_anim_trigger(cozmo.anim.Triggers.Shiver).wait_for_completed()
     while True:
         print ("keep going")
-        x.setSpeed(50.0, 50.0)
+        x.setSpeed(50.0, 20.0)
         sleep(1)
 cozmo.run_program(cozmo_program)
 
