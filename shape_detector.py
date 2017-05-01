@@ -1,9 +1,11 @@
 import cv2;
-from copy import deepcopy;
+import math;
 import numpy as np;
 
-def isLeftPentagon( hull ) :
+def isValidLeftPentagon( hull ) :
     eps = 4;
+
+    hull.sort();
 
     lx = abs( hull[ 1 ][ 0 ] - hull[ 2 ][ 0 ] );
     rx = abs( hull[ 3 ][ 0 ] - hull[ 4 ][ 0 ] );
@@ -17,8 +19,10 @@ def isLeftPentagon( hull ) :
 
     return abs( lx - rx ) <= eps and abs( ly - ry ) <= eps and abs( ymid - hull[ 0 ][ 1 ] ) < eps;
 
-def isRightPentagon( hull ) :
+def isValidRightPentagon( hull ) :
     eps = 4;
+
+    hull.sort();
 
     lx = abs( hull[ 0 ][ 0 ] - hull[ 1 ][ 0 ] );
     rx = abs( hull[ 2 ][ 0 ] - hull[ 3 ][ 0 ] );
@@ -86,6 +90,58 @@ def isValidSquare( hull ) :
 def hullToList( hull ) :
     return [ ( vertex[ 0 ][ 0 ], vertex[ 0 ][ 1 ] ) for vertex in hull ];
 
+def isValidLeftTriangle( hull ) :
+    hull.sort();
+
+    eps = 8;
+    xeps = 6;
+
+    print( hull );
+
+    if abs( hull[ 1 ][ 0 ] - hull[ 2 ][ 0 ] ) > xeps :
+        return False;
+
+    rxmid = int( ( hull[ 1 ][ 0 ] + hull[ 2 ][ 0 ] ) / 2 );
+    rymid = int( ( hull[ 1 ][ 1 ] + hull[ 2 ][ 1 ] ) / 2 );
+
+    print( rxmid, rymid );
+
+    if abs( hull[ 0 ][ 1 ] - rymid ) > eps :
+        return False;
+
+    dist1 = math.hypot( hull[ 0 ][ 0 ] - rxmid, hull[ 0 ][ 1 ] - hull[ 1 ][ 1 ] );
+    dist2 = math.hypot( hull[ 0 ][ 0 ] - rxmid, hull[ 0 ][ 1 ] - hull[ 2 ][ 1 ] );
+
+    print( "LEFT TRIANGLE", dist1, dist2 )
+
+    return abs( dist1 - dist2 ) <= eps;
+
+def isValidRightTriangle( hull ) :
+    hull.sort();
+
+    eps = 8;
+    xeps = 6;
+
+    print( hull );
+
+    if abs( hull[ 0 ][ 0 ] - hull[ 0 ][ 0 ] ) > xeps :
+        return False;
+
+    rxmid = int( ( hull[ 0 ][ 0 ] + hull[ 1 ][ 0 ] ) / 2 );
+    rymid = int( ( hull[ 0 ][ 1 ] + hull[ 1 ][ 1 ] ) / 2 );
+
+    print( rxmid, rymid );
+
+    if abs( hull[ 2 ][ 1 ] - rymid ) > eps :
+        return False;
+
+    dist1 = math.hypot( hull[ 2 ][ 0 ] - rxmid, hull[ 2 ][ 1 ] - hull[ 0 ][ 1 ] );
+    dist2 = math.hypot( hull[ 2 ][ 0 ] - rxmid, hull[ 2 ][ 1 ] - hull[ 1 ][ 1 ] );
+
+    print( "LEFT TRIANGLE", dist1, dist2 )
+
+    return abs( dist1 - dist2 ) <= eps;
+
 def getSignReadings( img ) :
     gray = cv2.cvtColor( img, cv2.COLOR_BGR2GRAY );
 
@@ -106,26 +162,35 @@ def getSignReadings( img ) :
     signs = [];
 
     for contour in contours :
-        if cv2.contourArea( contour ) < 300 :
-            continue;
-
         contourVertices = cv2.approxPolyDP( contour, 0.03 * cv2.arcLength( contour, True ), True );
         hullVertices = cv2.convexHull( contourVertices );
 
         if len( contourVertices ) != len( hullVertices ) :
             continue;
 
-        sides = len( hullVertices );
+        if cv2.contourArea( hullVertices ) < 300 :
+            continue;
 
-        if sides == 3 :
+        hull = hullToList( hullVertices );
+        sides = len( hull );
+
+        if sides == 3 and isValidLeftTriangle( hull ) :
             cv2.drawContours( img, [ hullVertices ], 0, ( 0, 255, 0 ), -1)
             signs.append( "triangle" );
 
-        elif sides == 4 and isValidSquare( hullToList( hullVertices ) ) :
+        elif sides == 3 and isValidRightTriangle( hull ) :
+            cv2.drawContours( img, [ hullVertices ], 0, ( 0, 255, 0 ), -1)
+            signs.append( "triangle" );
+
+        elif sides == 4 and isValidSquare( hull ) :
             cv2.drawContours( img, [ hullVertices ], 0, ( 0, 0, 255 ), 3 );
             signs.append( "square" );
 
-        elif sides == 5 and isValidPentagon( hullToList( hullVertices ) ) :
+        elif sides == 5 and isValidLeftPentagon( hull ) :
+            cv2.drawContours( img, [ hullVertices ], 0, 255, -1 );
+            signs.append( "pentagon" );
+
+        elif sides == 5 and isValidRightPentagon( hull ) :
             cv2.drawContours( img, [ hullVertices ], 0, 255, -1 );
             signs.append( "pentagon" );
 
