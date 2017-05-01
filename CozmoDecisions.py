@@ -3,83 +3,106 @@
 # interprets the sign tuple, then tells Cozmo what the
 # next step would be
 class CozmoObstacleCheck:
-    # ------- variables
-    # stores old sign list (for comparison)
-    oldSignList=[]
 
-    # stores sorted sign list. This is going to be a temp variable that will
-    # be used to decide the next movement for Cozmo.
-    sortedSigns=[]
-
-    # a list of only the close signs. This is also a temp variable used
-    # to decide the next movement for Cozmo.
-    cleanedSigns=[]
-
-    # stores current sign list (for comparison)
-    currentSignList=[]
-
-    # stores object closeness as a list
-    # 0 = neutral
-    # 1 = closer
-    # -1 = further away
-    objectDistance=[0,0,0,0,0,0,0,0,0]
-
-    # result of comparing the 2 sign lists
-    ### comparing the signs within the function should just return the value or the result of the
-    ### comparison rather than store the value. If you feel comfortable storing it make sure
-    ### you don't use the incorrect values within a new comparison later on. --Amanda (hue, hue, hue)
-    compareSignList=[]
-
-    # directions returned to cozmo. Comes as 2 tuples in a list.
-    # tuple 1: adjust wheel to veer the Cozmo (stay in the lines)
-    # tuple 2: which function to call the Cozmo, and the distance needed (if any)
-    # [(wheel, speed change as a percent),(function, distance if needed)]
-    # example [(left, 0.85),(stopSign,20)]
-    # note: wheel speed is a percent instead of absolute because Cozmos will
-    #       be traveling at different speeds
-    directionList=[]
-
-    # -------
 
     def __init__(self):
-        pass
+        # ------- variables
+        # stores old sign list (for comparison)
+        self.oldSignList=[]
 
-    def sortSigns(self,signToSort):
-        # sort by the closest obstacle distance
-        # ensure that obstacle type is not lost when distance is sorted
+        # stores sorted sign list. This is going to be a temp variable that will
+        # be used to decide the next movement for Cozmo.
+        self.sortedSigns=[]
 
-        #return sorted obstacle tuple
+        # a list of only the close signs. This is also a temp variable used
+        # to decide the next movement for Cozmo.
+        self.cleanedSigns=[]
+
+        # stores all seen signs as a list (for comparison)
+        self.allSignsList=[]
+
+        # stores current sign list without veering information
+        self.currentSignList=[]
+
+        # stores directions for veering
+        self.veeringDirections=()
+
+        # stores the max distance that an object should be recognized by the Cozmo
+        self.DISTANCE_THRESHOLD=60
+
+        # stores the number of signs that need to be focused on
+        # based on their distance threshold
+        self.signFocus=0
+
+        # stores object closeness as a list
+        # 0 = neutral
+        # 1 = closer
+        # -1 = further away
+        self.objectDistance=[0,0,0,0,0,0,0,0,0]
+
+        # result of comparing the 2 sign lists
+        ### comparing the signs within the function should just return the value or the result of the
+        ### comparison rather than store the value. If you feel comfortable storing it make sure
+        ### you don't use the incorrect values within a new comparison later on. --Amanda (hue, hue, hue)
+        self.compareSignList=[]
+
+        # directions returned to cozmo. Comes as 2 tuples in a list.
+        # tuple 1: adjust wheel to veer the Cozmo (stay in the lines)
+        # tuple 2: which function to call the Cozmo, and the distance needed (if any)
+        # [(wheel, speed change as a percent),(function, distance if needed)]
+        # example [(left, 0.85),(stopSign,20)]
+        # note: wheel speed is a percent instead of absolute because Cozmos will
+        #       be traveling at different speeds
+        self.directionList=[]
+
+        # -------
         return
 
-    def cleanSigns(self,signToCut):
-        # get size of tuples being sent
-        # run through all obstacles (assumed they are sorted)
-        # discard obstacles if they are > set distance
+    def pruneSigns(self):
+        # separates Tomas' openCV variable into veering and sign recognition.
+        # note: the sign list will need to be sorted, but veering will not
+        self.currentSignList=self.allSignsList[0]
+        self.veeringDirections=self.allSignsList[1]
 
-        # return list of valid obstacles.
+        return
+
+    def sortSigns(self):
+        # sort by the closest obstacle distance
+        # ensure that obstacle type is not lost when distance is sorted
+        self.currentSignList=sorted(self.currentSignList, key=lambda tup: tup[1])
+        # update currentSignList to become a sorted obstacle tuple
+        return
+
+    def cleanSigns(self):
+        # Originally, this function was going to remove the signs
+        # that were too far away and create a new tuple.
+        # Now, this function is going to just count the number of
+        # signs that need to be considered, without creating a new tuple
+        self.signFocus=0
+        for i in self.currentSignList:
+            if i[1] < self.DISTANCE_THRESHOLD:
+                self.signFocus+=1
         return
 
     def storeLast(self):
         # store the last set of sign data for comparison
-
-        # if no previous sign data (first read), store data
-
-        # if sign data is wiped (after turn, etc), store data
-
-        # if previous data present,
+        self.oldSignList=self.currentSignList
         return
 
     def interpretSigns(self):
         # call Tomas' openCV class to take in his return input of current signs
         # ----need Tomas' call name to get signs
-        #currentSignList=[[ (sign_1, dist_1), (sign_2, dist_2), ..., (sign_n, dist_n) ],(leftDist, rightDist, isBehindCozmo)]
-        self.currentSignList=[[(0,100),(1,100),(2,100),(3,50),(4,100),(5,100),(6,20),(7,100),(8,100)],[1,1]]
+        #allSignsList=[[ (sign_1, dist_1), (sign_2, dist_2), ..., (sign_n, dist_n) ],(leftDist, rightDist, isBehindCozmo)]
+        self.allSignsList=[[(0,100),(1,100),(2,100),(3,50),(4,100),(5,100),(6,20),(7,100),(8,100)],(1,1)]
+
+        # run pruneSigns to separate veering from sign design
+        self.pruneSigns()
 
         # run sortSigns to sort by the distance of seen objects
-        self.sortSigns(self.currentSignList)
+        self.sortSigns()
 
-        # run cleanSigns to focus on what's needed
-        self.cleanSigns(self.currentSignList)
+        # run cleanSigns to store the number of signs that need to be looked at
+        self.cleanSigns()
 
         return self.currentSignList
 
@@ -91,7 +114,7 @@ class CozmoObstacleCheck:
 
     def compareLast(self):
         # call viewLast to view the last tuple
-
+        previousDirections=self.viewLast()
         # if oldSignList has no data, act on
         # current signs only. Return the current
         # sign list
@@ -163,10 +186,13 @@ class CozmoObstacleCheck:
     def testThis(self):
         self.returnDirections()
         print("Ok, tested")
-        return self.currentSignList
+        print(self.allSignsList)
+        print(self.currentSignList)
+        print(self.veeringDirections)
+        return
 
 
-# temp main used to test the class. 
+# temp main used to test the class. Makes sure the directions transfer over.
 one=CozmoObstacleCheck()
 ourDirections=one.testThis()
 
