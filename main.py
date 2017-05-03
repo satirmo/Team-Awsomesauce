@@ -11,18 +11,49 @@ from time import sleep
 from cozmoDrives import cozmoDrives
 from constants import decisions
 
-# MAIN : will be a loop of decision making.
+# MAIN : will be a loop of decision making :: drive straight until X
 
 def cozmo_program(robot: cozmo.robot.Robot):
-    x = cozmoDrives(robot)
-    x.setSpeed(50.0, 50.0)
+    d = decision()
+    driver = cozmoDrives(robot)
+    info = -1
     while True:
-        print ("keep going")
-        x.setSpeed(50.0, 50.0)
-        sleep(1)
-cozmo.run_program(cozmo_program)
+        # Cozmo decision making loop.
+        info = driver.getInfo()
 
-# while True:
-#     # This will be leaving the cozmo default driving straight until
-#     # getInfo returns something important
-#     print ("Things should be here.")
+        if d.CONTINUE == info:
+            driver.setSpeed(50, 50)
+            break
+        elif d.TURN_RIGHT == info:
+            # Turn right, this is the wall case
+            
+        elif d.TURN_LEFT == info:
+            # Turn left, this is the wall case
+
+        elif d.TURN_OPTIONAL_LEFT == info:
+            # There is currently an option to turn left
+
+        elif d.TURN_OPTIONAL_RIGHT == info:
+            # There is currently an option to turn right
+
+        elif d.STOP_AHEAD == info:
+            # There is a stop sign ahead, decide what to do
+
+        elif d.COZMO_AHEAD_STOP == info:
+            # Cozmo is ahead of you possibly stop
+
+        elif d.COZMO_AHEAD == info:
+            # Cozmo is ahead, possibly moving
+
+        elif d.WAIT == info:
+            # Wait as in you're in traffic
+
+        elif d.SPEED_UPDATE == info:
+            # Update the speed to a new traffic pattern
+            driver.setNewLimit(True)
+        elif d.CORRECT_RIGHT == info:
+        elif d.CORRECT_LEFT == info:
+        else:
+            print ("Info Number ", info, " not described.")
+
+cozmo.run_program(cozmo_program)

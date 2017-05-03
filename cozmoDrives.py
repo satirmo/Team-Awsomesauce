@@ -45,12 +45,12 @@ class cozmoDrives:
         # Store the information
         # Retrieve the necessary information.
         print(" Switch/ If/else deciding what is in front of us.")
+        return -1
 
     # Setters
     def setSpeed(self, left_wheel, right_wheel):
         l_wheel_speed = left_wheel
         r_wheel_speed = right_wheel
-        print (l_wheel_speed, r_wheel_speed)
         l_wheel_acc = l_wheel_speed
         r_wheel_acc = r_wheel_speed
         msg = _clad_to_engine_iface.DriveWheels(lwheel_speed_mmps=l_wheel_speed,
@@ -62,6 +62,13 @@ class cozmoDrives:
             print("Error(?) : Speed unchanged / set to zero, please use setStop() instead.")
         else:
             print( "Cozmo Message :: Wheel Speed Updated.")
+
+    def setNewLimit(self, isFast):
+        if isFast:
+            setSpeed(self.MAX_SPEED, self.MIN_SPEED)
+        else:
+            setSpeed(self.MIN_SPEED, self.MIN_SPEED)
+
 
     def setStop(self):
         l_wheel_speed = 0.0
