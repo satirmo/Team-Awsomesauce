@@ -1,3 +1,8 @@
+# import random for use in optional turn directions
+import random
+#import constants to help easily translate directions
+import constants
+
 # Interpret the signs that Tomas sees
 # pulls from Tomas' openCV class
 # interprets the sign tuple, then tells Cozmo what the
@@ -7,8 +12,13 @@ class CozmoObstacleCheck:
 
     def __init__(self):
         # ------- variables
+        self.x=constants.decisions()
+
         # stores old sign list (for comparison)
-        self.oldSignList=[]
+        self.oldSignList=[('triangle left',100),("triangle right",100),
+                            ('square',100),('pentagon left',100),
+                            ('pentagon right',100),('octagon',100),
+                            ('circle',100),('cozmo',100)]
 
         # stores sorted sign list. This is going to be a temp variable that will
         # be used to decide the next movement for Cozmo.
@@ -18,8 +28,10 @@ class CozmoObstacleCheck:
         # to decide the next movement for Cozmo.
         self.cleanedSigns=[]
 
-        # stores all seen signs as a list (for comparison)
-        self.allSignsList=[]
+        # stores all seen signs as a list (for comparison), from Tomas' code
+        # Names: "triangle left" "triangle right" "square" "pentagon left"
+        #        "pentagon right" "octagon" "circle" "cozmo"
+        self.allSignsList=[[(0,100),(1,100),(2,100),(3,100),(4,100),(5,100),(6,100),(7,100),(8,100)],(1,1)]
 
         # stores current sign list without veering information
         self.currentSignList=[]
@@ -38,6 +50,8 @@ class CozmoObstacleCheck:
         # 0 = neutral
         # 1 = closer
         # -1 = further away
+        # note: with the group's advancement in openCV, this may not be needed
+        # anymore because we may not
         self.objectDistance=[0,0,0,0,0,0,0,0,0]
 
         # result of comparing the 2 sign lists
@@ -91,9 +105,13 @@ class CozmoObstacleCheck:
 
     def interpretSigns(self):
         # call Tomas' openCV class to take in his return input of current signs
-        # ----need Tomas' call name to get signs
+        # ----need Tomas' functions to call the signs. Will take 5 pictures,
+        # compare results, and determine what kind of signs are present.
         #allSignsList=[[ (sign_1, dist_1), (sign_2, dist_2), ..., (sign_n, dist_n) ],(leftDist, rightDist, isBehindCozmo)]
-        self.allSignsList=[[(0,100),(1,100),(2,100),(3,50),(4,100),(5,100),(6,20),(7,100),(8,100)],(1,1)]
+        self.allSignsList=[[('triangle left',100),("triangle right",100),
+                            ('square',100),('pentagon left',50),
+                            ('pentagon right',100),('octagon',100),
+                            ('circle',20),('cozmo',100)],(1,1)]
 
         # run pruneSigns to separate veering from sign design
         self.pruneSigns()
@@ -106,12 +124,14 @@ class CozmoObstacleCheck:
 
         return self.currentSignList
 
+    # may not be needed anymore due to advancements in openCV! WOO!
     def viewLast(self):
         # retrieves the data captured in storeLast
 
         # returns the data as a tuple
         pass
 
+    # may not be needed anymore due to advancements in openCV! WOO!
     def compareLast(self):
         # call viewLast to view the last tuple
         previousDirections=self.viewLast()
@@ -131,30 +151,87 @@ class CozmoObstacleCheck:
 
         pass
 
+    # based on advances in the group's OpenCV knowledge, this method will
+    # most likely not be needed
     def objectDistanceUpdate(self, positionUpdated, newValue):
         # updates the object distance array
         # positionUpdated = the list position to be updated
         self.objectDistance[positionUpdated]=newValue
         return
 
+    # checks the veering variable and returns if a left or right turn is
+    # needed
+    def checkVeering(self):
+        # review past variables for left and right distance
+        # if within threshold to veer left or right,
+        # send it back to self.veeringDirections
+        pass
 
     # this is the main function of the class
     # it calls all the other functions and
     # returns the directions for the Cozmo
     # previously titled "logicBomb"
     def returnDirections(self):
+        # run interpretSigns to split Tomas' data into the foundation for
         # run interpretSigns
         self.interpretSigns()
         # run compareLast
 
         # call storeLast to save old signs
+        self.storeLast()
 
-        # if a stop sign was close and then vanished,
-        # we assume that the sign was just passed
+        # Begin analysis to determine next direction list for Cozmo. This is
+        # essentially a large switch statement. Only Python doesn't do switch
+        # statements, so we'll be using if/else
 
-        # if only 1 sign noted, return directions for that sign
+        # If only 1 sign is noted, return directions for that sign
         # based on comparison and distance
+        if(0):
+            # if stop sign is seen first
+            if(self.currentSignList[0][0]=='octagon'):
+                # if within our DISTANCE_THRESHOLD, initiate turn with distance needed
+                if(self.currentSignList[0][1]<DISTANCE_THRESHOLD):
+                    pass
+                # if outside of our DISTANCE_THRESHOLD, continue as normal and rescan
+                else:
+                    self.directionList[0][0]=self.x.CONTINUE
+                pass
+            # if another Cozmo is infront in same lane
+                # instruct Cozmo to move the distance between the two objects
+                # then stop and wait for the other object to move
 
+            # if left turn sign
+                # if within our DISTANCE_THRESHOLD, initiate turn with distance needed
+
+                # if outside of DISTANCE_THRESHOLD, continue as normal until within range
+
+            # if right turn sign
+                # if within our DISTANCE_THRESHOLD, initiate turn with distance needed
+
+                # if outside of DISTANCE_THRESHOLD, continue as normal until within range
+
+            # if optional left turn sign
+            if(0):
+                # draw a random number within an if statement to determine turning
+                if(random.randrange(0,2)):
+                    #turn left
+                    pass
+                else:
+                    # stay straight
+                    pass
+                pass
+            # if optional right turn sign
+            if(0):
+                pass
+                # draw a random number within an if statement to determine turning
+                if(random.randrange(0,2)):
+                    #turn right
+                    pass
+                else:
+                    # stay straight
+                    pass
+                pass
+            pass
         # if 2 signs noted, examine the order of the signs and
         # act on preferences.
 
@@ -176,26 +253,26 @@ class CozmoObstacleCheck:
                     # if the Cozmo is close enough to act on the stop sign,
                     # return call to stop
 
-                #
 
 
-        return
+        return self.directionList
 
     # this is a test class that will be nuked as soon as this puppy is
     # up and running with the correct logic.
     def testThis(self):
         self.returnDirections()
         print("Ok, tested")
-        print(self.allSignsList)
-        print(self.currentSignList)
-        print(self.veeringDirections)
+        # print(self.allSignsList)
+        # print(self.currentSignList)
+        # print(self.veeringDirections)
+        print(self.directionList)
         return
 
 
 # temp main used to test the class. Makes sure the directions transfer over.
 one=CozmoObstacleCheck()
-ourDirections=one.testThis()
+one.testThis()
+#x=constants.decisions()
 
-print(ourDirections)
 
 exit()
