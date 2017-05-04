@@ -36,6 +36,9 @@ class CozmoObstacleCheck:
         # stores current sign list without veering information
         self.currentSignList=[]
 
+        # stored lane distance
+        self.laneDistances=(110,90)
+
         # stores directions for veering
         self.veeringDirections=()
 
@@ -76,7 +79,7 @@ class CozmoObstacleCheck:
         # separates Tomas' openCV variable into veering and sign recognition.
         # note: the sign list will need to be sorted, but veering will not
         self.currentSignList=self.allSignsList[0]
-        self.veeringDirections=self.allSignsList[1]
+        self.laneDistances=self.allSignsList[1]
 
         return
 
@@ -163,8 +166,31 @@ class CozmoObstacleCheck:
     # needed
     def checkVeering(self):
         # review past variables for left and right distance
-        # if within threshold to veer left or right,
-        # send it back to self.veeringDirections
+        # our thresholds for this right now, tentatively, are:
+        # >=159 for being too far from one of the sides, and
+        # <=75 for being too close to one of the sides
+        #print("testing veering")
+
+        # if left and right are both between 90 and 140
+        if(self.laneDistances[0] >= 85 and self.laneDistances[0] <= 135 and
+            self.laneDistances[1] >= 85 and self.laneDistances[1] <= 135):
+
+            # return directions for staying on course
+            self.veeringDirections=(x.CONTINUE)
+            pass
+        # if left is less than 90
+            # adjust away from the left (make the number bigger)
+
+        # if left is more than 130
+            # check other lane to see if it's within its threshold. ----------
+            # adjust towards the left (make the number smaller)
+
+        # if right is less than 90
+            # adjust away from the right (make the number bigger)
+
+        # if right is more than 130
+            # adjust towards the right (make the number smaller)
+
         pass
 
     # this is the main function of the class
@@ -173,9 +199,13 @@ class CozmoObstacleCheck:
     # previously titled "logicBomb"
     def returnDirections(self):
         # run interpretSigns to split Tomas' data into the foundation for
+        # veering directions and sign response
+
         # run interpretSigns
         self.interpretSigns()
         # run compareLast
+        # note: we may not need to do this anymore due to advancement
+        #       in openCV. Hazaa!
 
         # call storeLast to save old signs
         self.storeLast()
@@ -253,7 +283,8 @@ class CozmoObstacleCheck:
                     # if the Cozmo is close enough to act on the stop sign,
                     # return call to stop
 
-
+        # check veering
+        self.checkVeering()
 
         return self.directionList
 
