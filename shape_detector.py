@@ -2,60 +2,55 @@ import cv2;
 import math;
 import numpy as np;
 
-def isValidLeftPentagon( hull ) :
-    eps = 4;
+def isValidLeftTriangle( hull ) :
+    eps = 8;
+    xeps = 6;
 
-    hull.sort();
-
-    lx = abs( hull[ 1 ][ 0 ] - hull[ 2 ][ 0 ] );
-    rx = abs( hull[ 3 ][ 0 ] - hull[ 4 ][ 0 ] );
-
-    ly = abs( hull[ 1 ][ 1 ] - hull[ 2 ][ 1 ] );
-    ry = abs( hull[ 3 ][ 1 ] - hull[ 4 ][ 1 ] );
-
-    ymid = ( hull[ 1 ][ 1 ] + hull[ 2 ][ 1 ] ) / 2;
-
-    # print( "LEFT:", lx, rx, ly, ry, ymid );
-
-    return abs( lx - rx ) <= eps and abs( ly - ry ) <= eps and abs( ymid - hull[ 0 ][ 1 ] ) < eps;
-
-def isValidRightPentagon( hull ) :
-    eps = 4;
-
-    hull.sort();
-
-    lx = abs( hull[ 0 ][ 0 ] - hull[ 1 ][ 0 ] );
-    rx = abs( hull[ 2 ][ 0 ] - hull[ 3 ][ 0 ] );
-
-    ly = abs( hull[ 0 ][ 1 ] - hull[ 1 ][ 1 ] );
-    ry = abs( hull[ 2 ][ 1 ] - hull[ 3 ][ 1 ] );
-
-    ymid = ( hull[ 2 ][ 1 ] + hull[ 3 ][ 1 ] ) / 2;
-
-    # print( "RIGHT:", lx, rx, ly, ry, ymid );
-
-    return abs( lx - rx ) <= eps and abs( ly - ry ) <= eps and abs( ymid - hull[ 4 ][ 1 ] ) < eps;
-
-def isValidPentagon( hull ) :
-    # print( hull );
-    hull.sort();
     # print( hull );
 
-    if isLeftPentagon( hull ) :    
-        print( "Left Pentagon!" );
-        return True;
+    if abs( hull[ 1 ][ 0 ] - hull[ 2 ][ 0 ] ) > xeps :
+        return False;
 
-    if isRightPentagon( hull ) :
-        print( "Right Pentagon!" );
-        return True;
+    rxmid = int( ( hull[ 1 ][ 0 ] + hull[ 2 ][ 0 ] ) / 2 );
+    rymid = int( ( hull[ 1 ][ 1 ] + hull[ 2 ][ 1 ] ) / 2 );
 
-    return False;
+    # print( rxmid, rymid );
+
+    if abs( hull[ 0 ][ 1 ] - rymid ) > eps :
+        return False;
+
+    dist1 = math.hypot( hull[ 0 ][ 0 ] - rxmid, hull[ 0 ][ 1 ] - hull[ 1 ][ 1 ] );
+    dist2 = math.hypot( hull[ 0 ][ 0 ] - rxmid, hull[ 0 ][ 1 ] - hull[ 2 ][ 1 ] );
+
+    # print( "LEFT TRIANGLE", dist1, dist2 )
+
+    return abs( dist1 - dist2 ) <= eps;
+
+def isValidRightTriangle( hull ) :
+    eps = 8;
+    xeps = 6;
+
+    # print( hull );
+
+    if abs( hull[ 0 ][ 0 ] - hull[ 1 ][ 0 ] ) > xeps :
+        return False;
+
+    rxmid = int( ( hull[ 0 ][ 0 ] + hull[ 1 ][ 0 ] ) / 2 );
+    rymid = int( ( hull[ 0 ][ 1 ] + hull[ 1 ][ 1 ] ) / 2 );
+
+    # print( rxmid, rymid );
+
+    if abs( hull[ 2 ][ 1 ] - rymid ) > eps :
+        return False;
+
+    dist1 = math.hypot( hull[ 2 ][ 0 ] - rxmid, hull[ 2 ][ 1 ] - hull[ 0 ][ 1 ] );
+    dist2 = math.hypot( hull[ 2 ][ 0 ] - rxmid, hull[ 2 ][ 1 ] - hull[ 1 ][ 1 ] );
+
+    # print( "RIGHT TRIANGLE", dist1, dist2 )
+
+    return abs( dist1 - dist2 ) <= eps;
 
 def isValidSquare( hull ) :
-    hull.sort();
-
-    print( hull );
-
     eps = 5;
 
     lx = abs( hull[ 0 ][ 0 ] - hull[ 1 ][ 0 ] );
@@ -64,7 +59,7 @@ def isValidSquare( hull ) :
     ly = abs( hull[ 0 ][ 1 ] - hull[ 1 ][ 1 ] );
     ry = abs( hull[ 2 ][ 1 ] - hull[ 3 ][ 1 ] );
 
-    print( lx, rx, ly, ry );
+    # print( lx, rx, ly, ry );
 
     if abs( lx - rx ) > eps or abs( ly - ry ) > eps :
         return False;
@@ -83,66 +78,91 @@ def isValidSquare( hull ) :
     dx = abs( lxmid - rxmid );
     dy = abs( lymid - rymid );
 
-    print( dx, dy );
+    # print( dx, dy );
 
     return abs( dx - dy ) <= eps;
+
+def isValidLeftPentagon( hull ) :
+    eps = 4;
+
+    lx = abs( hull[ 1 ][ 0 ] - hull[ 2 ][ 0 ] );
+    rx = abs( hull[ 3 ][ 0 ] - hull[ 4 ][ 0 ] );
+
+    ly = abs( hull[ 1 ][ 1 ] - hull[ 2 ][ 1 ] );
+    ry = abs( hull[ 3 ][ 1 ] - hull[ 4 ][ 1 ] );
+
+    ymid = ( hull[ 1 ][ 1 ] + hull[ 2 ][ 1 ] ) / 2;
+
+    # print( "LEFT:", lx, rx, ly, ry, ymid );
+
+    return abs( lx - rx ) <= eps and abs( ly - ry ) <= eps and abs( ymid - hull[ 0 ][ 1 ] ) < eps;
+
+def isValidRightPentagon( hull ) :
+    eps = 4;
+
+    lx = abs( hull[ 0 ][ 0 ] - hull[ 1 ][ 0 ] );
+    rx = abs( hull[ 2 ][ 0 ] - hull[ 3 ][ 0 ] );
+
+    ly = abs( hull[ 0 ][ 1 ] - hull[ 1 ][ 1 ] );
+    ry = abs( hull[ 2 ][ 1 ] - hull[ 3 ][ 1 ] );
+
+    ymid = ( hull[ 2 ][ 1 ] + hull[ 3 ][ 1 ] ) / 2;
+
+    # print( "RIGHT:", lx, rx, ly, ry, ymid );
+
+    return abs( lx - rx ) <= eps and abs( ly - ry ) <= eps and abs( ymid - hull[ 4 ][ 1 ] ) < eps;
 
 def hullToList( hull ) :
     return [ ( vertex[ 0 ][ 0 ], vertex[ 0 ][ 1 ] ) for vertex in hull ];
 
-def isValidLeftTriangle( hull ) :
-    hull.sort();
+def distanceFromHull( width, shape ) :
+    knownWidth, focalLength = distanceConstants[ shape ];
 
-    eps = 8;
-    xeps = 6;
+    return knownWidth * focalLength / width;
 
-    print( hull );
+# ------ FIX THIS ------
+# ------ FIX THIS ------
+# ------ FIX THIS ------
+def getWidthCircle( hull ) :
+    return -1;
+# ------ FIX THIS ------
+# ------ FIX THIS ------
+# ------ FIX THIS ------
 
-    if abs( hull[ 1 ][ 0 ] - hull[ 2 ][ 0 ] ) > xeps :
-        return False;
+def getWidthSquare( sign ) :
+    lx = int( ( sign[ 0 ][ 0 ] + sign[ 1 ][ 0 ] ) / 2 );
+    rx = int( ( sign[ 2 ][ 0 ] + sign[ 3 ][ 0 ] ) / 2 );
 
-    rxmid = int( ( hull[ 1 ][ 0 ] + hull[ 2 ][ 0 ] ) / 2 );
-    rymid = int( ( hull[ 1 ][ 1 ] + hull[ 2 ][ 1 ] ) / 2 );
+    return rx - lx;
 
-    print( rxmid, rymid );
+def getWidthLeftPentagon( sign ) :
+    rx = int( ( sign[ 3 ][ 0 ] + sign[ 4 ][ 0 ] ) / 2 );
 
-    if abs( hull[ 0 ][ 1 ] - rymid ) > eps :
-        return False;
+    return rx - sign[ 0 ][ 0 ];
 
-    dist1 = math.hypot( hull[ 0 ][ 0 ] - rxmid, hull[ 0 ][ 1 ] - hull[ 1 ][ 1 ] );
-    dist2 = math.hypot( hull[ 0 ][ 0 ] - rxmid, hull[ 0 ][ 1 ] - hull[ 2 ][ 1 ] );
+def getWidthRightTriangle( sign ) :
+    lx = int( ( sign[ 0 ][ 0 ] + sign[ 1 ][ 0 ] ) / 2 );
 
-    print( "LEFT TRIANGLE", dist1, dist2 )
+    return sign[ 2 ][ 0 ] - lx;
 
-    return abs( dist1 - dist2 ) <= eps;
+def getWidthRightPentagon( sign ) :
+    lx = int( ( sign[ 0 ][ 0 ] + sign[ 1 ][ 0 ] ) / 2 );
 
-def isValidRightTriangle( hull ) :
-    hull.sort();
+    return sign[ 4 ][ 0 ] - lx;
 
-    eps = 8;
-    xeps = 6;
+def getWidthOctagon( sign ) :
+    lx = int( ( sign[ 0 ][ 0 ] + sign[ 1 ][ 0 ] ) / 2 );
+    rx = int( ( sign[ 6 ][ 0 ] + sign[ 7 ][ 0 ] ) / 2 );
 
-    print( hull );
+    return rx - lx;
 
-    if abs( hull[ 0 ][ 0 ] - hull[ 0 ][ 0 ] ) > xeps :
-        return False;
+def getWidthLeftTriangle( sign ) :
+    rx = int( ( sign[ 1 ][ 0 ] + sign[ 2 ][ 0 ] ) / 2 );
 
-    rxmid = int( ( hull[ 0 ][ 0 ] + hull[ 1 ][ 0 ] ) / 2 );
-    rymid = int( ( hull[ 0 ][ 1 ] + hull[ 1 ][ 1 ] ) / 2 );
-
-    print( rxmid, rymid );
-
-    if abs( hull[ 2 ][ 1 ] - rymid ) > eps :
-        return False;
-
-    dist1 = math.hypot( hull[ 2 ][ 0 ] - rxmid, hull[ 2 ][ 1 ] - hull[ 0 ][ 1 ] );
-    dist2 = math.hypot( hull[ 2 ][ 0 ] - rxmid, hull[ 2 ][ 1 ] - hull[ 1 ][ 1 ] );
-
-    print( "LEFT TRIANGLE", dist1, dist2 )
-
-    return abs( dist1 - dist2 ) <= eps;
+    return rx - sign[ 0 ][ 0 ];
 
 def getSignReadings( img ) :
+    # PROCESSING IMAGE
     gray = cv2.cvtColor( img, cv2.COLOR_BGR2GRAY );
 
     blur = cv2.blur( gray, ( 3, 5 ) );
@@ -156,9 +176,9 @@ def getSignReadings( img ) :
     maskedInvert = cv2.bitwise_not( masked );
 
     ret, thresh = cv2.threshold( maskedInvert, 35, 255, 1 );
-    # cv2.imshow( "aksjdksja", thresh );
     contourImg, contours, hierarchy = cv2.findContours( thresh, 1, 2 );
 
+    # GET SIGNS FROM CONTOURS
     signs = [];
 
     for contour in contours :
@@ -172,48 +192,71 @@ def getSignReadings( img ) :
             continue;
 
         hull = hullToList( hullVertices );
+        hull.sort();
         sides = len( hull );
 
+        # cv2.imshow( "image", img );
+        # cv2.waitKey();
+
+        # print( "checking:", hull );
+
         if sides == 3 and isValidLeftTriangle( hull ) :
-            cv2.drawContours( img, [ hullVertices ], 0, ( 0, 255, 0 ), -1)
-            signs.append( "triangle" );
+            shape = "triangle left";
+            widthHull = getWidthLeftTriangle( hull );
 
         elif sides == 3 and isValidRightTriangle( hull ) :
-            cv2.drawContours( img, [ hullVertices ], 0, ( 0, 255, 0 ), -1)
-            signs.append( "triangle" );
+            shape = "triangle right";
+            widthHull = getWidthRightTriangle( hull );
 
         elif sides == 4 and isValidSquare( hull ) :
-            cv2.drawContours( img, [ hullVertices ], 0, ( 0, 0, 255 ), 3 );
-            signs.append( "square" );
+            shape = "square";
+            widthHull = getWidthSquare( hull );
 
         elif sides == 5 and isValidLeftPentagon( hull ) :
-            cv2.drawContours( img, [ hullVertices ], 0, 255, -1 );
-            signs.append( "pentagon" );
+            shape = "pentagon left";
+            widthHull = getWidthLeftPentagon( hull );
 
         elif sides == 5 and isValidRightPentagon( hull ) :
-            cv2.drawContours( img, [ hullVertices ], 0, 255, -1 );
-            signs.append( "pentagon" );
+            shape = "pentagon right";
+            widthHull = getWidthRightPentagon( hull );
 
         elif sides == 8 :
-            cv2.drawContours( img, [ hullVertices ], 0, ( 0, 0, 255 ), 3 );
-            signs.append( "octagon" );
+            shape = "octagon";
+            widthHull = getWidthOctagon( hull );
 
         elif sides >= 15 :
-            cv2.drawContours( img, [ hullVertices ], 0, ( 0, 255, 255 ), 3 );
-            signs.append( "circle" );
+            shape = "circle";
+            widthHull = getWidthCircle( hull );
 
+        else :
+            continue;
 
-    print( signs );
-    cv2.imshow( "text", img );
-    cv2.waitKey();
+        distance = distanceFromHull( widthHull, shape );
+        signs.append( ( shape, distance ) );
+        cv2.drawContours( img, [ hullVertices ], 0, ( 0, 255, 0 ), -1);
+
+    # print( signs );
+    # cv2.imshow( "text", img );
+    # cv2.waitKey();
 
     return signs;
+
+''' GET COZMO WIDTHS '''
+'''
+circle
+cozmo
+'''
+
+distanceConstants = {'octagon': (4, 109.5), 'triangle left': (5, 76.799999999999997), 'triangle right': (5, 75.599999999999994), 'pentagon left': (4, 126.0), 'square': (1, 264.0), 'pentagon right': (4, 123.75)};
 
 # Driver Code
 if __name__ == "__main__" :
     for i in range( 1, 20 ):
         print( "----------" );
-        name = 'cozmoRoad' + str(i) + '.png'
+        name = 'centerRoad' + str(i) + '.png'
         img = cv2.imread( name );
-        
+
         signReadings = getSignReadings( img );
+        print( signReadings );        
+        cv2.imshow( "image", img );
+        cv2.waitKey();
