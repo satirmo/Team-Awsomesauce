@@ -20,6 +20,7 @@ class CozmoObstacleCheck:
 
     def __init__(self):
         # ------- variables
+        # imports constants class. Acts as Python enums.
         self.x=constants.decisions()
 
         # stores old sign list (for comparison)
@@ -44,7 +45,11 @@ class CozmoObstacleCheck:
 
         # stores the max distance that an object should be recognized by the Cozmo
         self.DISTANCE_THRESHOLD=60
+
+        # stores the highest distance from a lane allowed before correcting
         self.highThreshold=130
+
+        # stores the lowest distance from a lane allowed before correcting
         self.lowThreshold=90
 
         # stores the number of signs that need to be focused on
@@ -117,13 +122,6 @@ class CozmoObstacleCheck:
         return self.currentSignList
 
     # may not be needed anymore due to advancements in openCV! WOO!
-    def viewLast(self):
-        # retrieves the data captured in storeLast
-
-        # returns the data as a tuple
-        pass
-
-    # may not be needed anymore due to advancements in openCV! WOO!
     def compareLast(self):
         # call viewLast to view the last tuple
         previousDirections=self.viewLast()
@@ -167,6 +165,12 @@ class CozmoObstacleCheck:
             # return directions for staying on course
             self.veeringDirections=self.x.CONTINUE
 
+        # if neither lane can be seen
+        elif(self.laneDistances[0] >= 140 and self.laneDistances[0] >= 140):
+            # if the last sign was an optional right turn, we'll continue
+            if(self.oldSignList[0][0]=='triangle right'):
+                self.veeringDirections=self.x.CORRECT_LEFT
+
         # if left lane is close
         elif(self.laneDistances[0] < self.lowThreshold):
             # adjust away from the left (make the number bigger)
@@ -196,6 +200,8 @@ class CozmoObstacleCheck:
             # otherwise, continue as normal
             else:
                 self.veeringDirections=(self.x.CONTINUE)
+
+        # if all else fails ...
         else:
             self.veeringDirections=(self.x.CONTINUE)
         return self.veeringDirections
@@ -219,7 +225,7 @@ class CozmoObstacleCheck:
         # call storeLast to save old signs
         self.storeLast()
 
-        # check veering status
+        # check veering status here
         self.veeringDirections=self.checkVeering()
 
         # Begin analysis to determine next direction list for Cozmo. This is
@@ -238,36 +244,30 @@ class CozmoObstacleCheck:
             # if the sign is too far away, send directions to continue
             if(self.currentSignList[0][1]>self.DISTANCE_THRESHOLD):
                 self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
-                return self.directionList
 
             # if stop sign is seen first
             elif(self.currentSignList[0][0]=='octagon'):
                 self.directionList=[self.x.STOP_AHEAD,self.currentSignList[0][1],self.veeringDirections]
-                return self.directionList
 
             # if another Cozmo is infront in same lane, and a stop sign is visible behind
             elif(self.currentSignList[0][0]=='cozmo' and self.currentSignList[1][0]=='octagon'):
                 # instruct Cozmo to move the distance between the two objects
                 # then stop and rescan until the other object moves
                 self.directionList=[self.x.COZMO_AHEAD_STOP,self.currentSignList[0][1],self.veeringDirections,self.currentSignList[1][1]]
-                return self.directionList
 
             # if another Cozmo is infront in same lane
             elif(self.currentSignList[0][0]=='cozmo'):
                 # instruct Cozmo to move the distance between the two objects
                 # then stop and rescan until the other object moves
                 self.directionList=[self.x.COZMO_AHEAD,self.currentSignList[0][1],self.veeringDirections]
-                return self.directionList
 
             # if left turn sign
             elif(self.currentSignList[0][0]=='pentagon left'):
                 self.directionList=[self.x.TURN_LEFT,self.currentSignList[0][1],self.veeringDirections]
-                return self.directionList
 
             # if right turn sign
             elif(self.currentSignList[0][0]=='pentagon right'):
                 self.directionList=[self.x.TURN_RIGHT,self.currentSignList[0][1],self.veeringDirections]
-                return self.directionList
 
             # if optional left turn sign
             elif(self.currentSignList[0][0]=='triangle left'):
@@ -275,33 +275,28 @@ class CozmoObstacleCheck:
                 if(random.randrange(0,2)):
                     #turn left
                     self.directionList=[self.x.TURN_LEFT,self.currentSignList[0][1],self.veeringDirections]
-                    return self.directionList
                 else:
                     # stay straight
                     self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
-                    return self.directionList
             # if optional right turn sign
             elif(self.currentSignList[0][0]=='triangle right'):
                 # draw a random number within an if statement to determine turning
                 if(random.randrange(0,2)):
                     #turn right
                     self.directionList=[self.x.TURN_RIGHT,self.currentSignList[0][1],self.veeringDirections]
-                    return self.directionList
                 else:
                     # stay straight
                     self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
-                    return self.directionList
 
             # with speed update, a distance of 1 = go faster, and 0 = slower
             # if speed up
             elif(self.currentSignList[0][0]=='square'):
                 self.directionList=[self.x.SPEED_UPDATE,1,self.veeringDirections]
-                return self.directionList
 
             # if slow down
             elif(self.currentSignList[0][0]=='circle'):
                 self.directionList=[self.x.SPEED_UPDATE,0,self.veeringDirections]
-                return self.directionList
+
 
         return self.directionList
 
