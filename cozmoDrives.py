@@ -8,6 +8,7 @@
 
 import cv2
 import cozmo
+import numpy
 from CozmoDecisions import CozmoObstacleCheck
 from constants import CONST
 from constants import decisions
@@ -31,15 +32,23 @@ class cozmoDrives:
 
         # Instance of Cozmo
         self.robot = a_robot
+        print("1")
         self.robot.set_head_angle(degrees(5)).wait_for_completed()
+        print("2")
         self.robot.camera.image_stream_enabled = True
-        self.robot.wait_for(cozmo.world.EvtNewCamerImage)
+        print("3")
+        self.robot.wait_for(cozmo.world.EvtNewCameraImage)
+        print("4")
+
         # Instance of John's class object.
         self.situationHandler = CozmoObstacleCheck()
+        print("5")
 
         # Status variables
         self.stopTurn = randint(self.LEFT, self.RIGHT)
+        print("6")
         self.toTurn = randint(0, 1)
+        print("7")
 
     # Getters
     def getSpeedLimit(self):
@@ -60,8 +69,12 @@ class cozmoDrives:
     def getInfo(self):
 
         #TAKE PICTURE
-        picture = self.robot.world.latest_image.raw_image
-        cv2_image = cv2.cvtColor(numpy.array(picture), cv2.COLOR_RGB2BGR)
+        latest_image = self.robot.world.latest_image
+        if latest_image is not None:
+            picture = self.robot.world.latest_image.raw_image
+            cv2_image = cv2.cvtColor(numpy.array(picture), cv2.COLOR_RGB2BGR)
+        else:
+            print("No image taken")
         # Function call from John
         information = self.situationHandler.returnDirections(picture)
         # Store the information
@@ -71,6 +84,7 @@ class cozmoDrives:
 
     # Setters
     def setSpeed(self, left_wheel, right_wheel):
+        print("HELLLLLOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
         l_wheel_speed = left_wheel
         r_wheel_speed = right_wheel
         l_wheel_acc = l_wheel_speed
@@ -144,6 +158,3 @@ class cozmoDrives:
         self.robot.DriveStraight(distance_to_stop, driver.getSpeedLimit(), False).wait_for_completed()
         self.robot.stop_all_motors()
         return
-
-newClass = cozmoDrives()
-newClass.getInfo()

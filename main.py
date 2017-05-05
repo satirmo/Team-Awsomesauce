@@ -15,7 +15,7 @@ from constants import CONST
 # MAIN : will be a loop of decision making :: drive straight until X
 
 def cozmo_program(robot: cozmo.robot.Robot):
-    d = decision()
+    d = decisions()
     con = CONST()
     road_width = con.ROAD_WIDTH
     mid_width = con.MID_WIDTH
@@ -23,6 +23,8 @@ def cozmo_program(robot: cozmo.robot.Robot):
     isVeer = 0
     count = 0
     previousCorrection = None
+
+    driver.setSpeed(driver.getSpeedLimit(), driver.getSpeedLimit())
 
     while True:
         # Cozmo decision making loop. :: always driving straight

@@ -10,13 +10,14 @@ import os
 
 class CozmoNeuralNet :
 	def __init__( self ) :
+		print("TOMAS IS ALIVE")
 		rawImages = []
 		features = []
 		labels = []
 
 		for i in range( 1, 1001 ) :
 			number = str( i );
-
+			print(i)
 			if i <= 500 :
 				label = True;
 
@@ -77,17 +78,17 @@ class CozmoNeuralNet :
 
 
 
-if __name__ == "__main__" :
-	cnn = CozmoNeuralNet();
-
-	for i in range( 1, 30 ) :
-		path = "C:\\Users\Amandas\Desktop\OpenCV\Examples\cozmo-python-sdk\cozmoDrives\Team-Awsomesauce\Test Data\\test" + str( i ) + ".png";
-		image = cv2.imread( path );
-
-		hist = cnn.extract_color_histogram(image)
-		result = cnn.model.predict( [hist] )[ 0 ]
-
-		print( "result", i, ":", result );
-
-		cv2.imshow( "sample", image );
-		cv2.waitKey();
+# if __name__ == "__main__" :
+# 	cnn = CozmoNeuralNet();
+#
+# 	for i in range( 1, 30 ) :
+# 		path = "C:\\Users\Amandas\Desktop\OpenCV\Examples\cozmo-python-sdk\cozmoDrives\Team-Awsomesauce\Test Data\\test" + str( i ) + ".png";
+# 		image = cv2.imread( path );
+#
+# 		hist = cnn.extract_color_histogram(image)
+# 		result = cnn.model.predict( [hist] )[ 0 ]
+#
+# 		print( "result", i, ":", result );
+#
+# 		cv2.imshow( "sample", image );
+# 		cv2.waitKey();
