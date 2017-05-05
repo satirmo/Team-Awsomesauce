@@ -85,8 +85,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
 
         elif d.COZMO_AHEAD == decision_maker:
             # Cozmo is ahead, possibly moving
-            print("Cozmo is ahead")
-
+            driver.setStop(distance)
         elif d.WAIT == decision_maker:
             # Wait as in you're in traffic
             driver.emergencyStop()
