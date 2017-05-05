@@ -55,6 +55,7 @@ class cozmoDrives:
         direction = self.stopTurn
         self.stopTurn = randint(self.LEFT, self.RIGHT)
         return direction
+
     # This will be information from John Atti
     def getInfo(self):
 
@@ -139,7 +140,10 @@ class cozmoDrives:
             print("Error : Decision to turn number ", direction, " not a valid turn.")
         # turn towards that direction
 
-    def
+    def cozmoDriveDistance(self, distance):
+        self.robot.DriveStraight(distance_to_stop, driver.getSpeedLimit(), False).wait_for_completed()
+        self.robot.stop_all_motors()
+        return
 
 newClass = cozmoDrives()
 newClass.getInfo()

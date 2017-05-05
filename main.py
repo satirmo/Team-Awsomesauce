@@ -31,8 +31,6 @@ def cozmo_program(robot: cozmo.robot.Robot):
         # distance from camera rather than the front of the car
         distance = (info[1] + con.COZMO_FRONT)
         veering = info[2]
-        distance_to_stop = info[3] # Cozmo ahead stop
-
 
         if d.TURN_RIGHT == decision_maker:
             # Turn right, this is the wall case
@@ -69,16 +67,21 @@ def cozmo_program(robot: cozmo.robot.Robot):
 
         elif d.COZMO_AHEAD_STOP == decision_maker:
             # Cozmo is ahead of you possibly stop
+            if len(info) != 4:
+                print("Critical Error :: missing value in decision stop ahead.")
             driver.setStop(distance)
+            distance_to_stop = info[3] # Cozmo ahead stop
             while True:
                 temp = driver.getInfo()
                 if temp[0] != d.COZMO_AHEAD_STOP:
                     break
-            driver.DriveStraight(distance_to_stop, driver.getSpeedLimit(), False).wait_for_completed()
-            driver.setStop(0)
-            
-
-
+            driver.cozmoDriveDistance(distance_to_stop)
+            direct = driver.getWhichWay()
+            # Make a turn using the turn options!
+            if direct == d.TURN_LEFT:
+                driver.roadTurn(direct, (2*road_width + mid_width))
+            elif direct == d.TURN_RIGHT:
+                driver.roadTurn(direct, road_width)
 
         elif d.COZMO_AHEAD == decision_maker:
             # Cozmo is ahead, possibly moving
