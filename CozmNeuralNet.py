@@ -1,3 +1,4 @@
+from numpy._distributor_init import NUMPY_MKL
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cross_validation import train_test_split
 from imutils import paths
@@ -23,7 +24,7 @@ class CozmoNeuralNet :
 				label = False;
 
 			# Update path as needed
-			path = "/home/satirmo/Projects/Team-Awesomesauce/CozmoCV/Object_Detection/Training_Data/train" + number + ".png";
+			path = "/Training_Data/train" + number + ".png";
 			image = cv2.imread( path );
 
 			pixels = self.image_to_feature_vector(image)
@@ -80,9 +81,9 @@ if __name__ == "__main__" :
 	cnn = CozmoNeuralNet();
 
 	for i in range( 1, 30 ) :
-		path = "/home/satirmo/Projects/Team-Awesomesauce/CozmoCV/Object_Detection/TestData/test" + str( i ) + ".png";
+		path = "/TestData/test" + str( i ) + ".png";
 		image = cv2.imread( path );
-		
+
 		hist = cnn.extract_color_histogram(image)
 		result = cnn.model.predict( [hist] )[ 0 ]
 

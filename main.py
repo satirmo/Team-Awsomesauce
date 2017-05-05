@@ -124,7 +124,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
                 driver.setSpeed(driver.getSpeedLimit() + 2, driver.getSpeedLimit())
                 continue
         else:
-            print("Inccorect veering cases")
+            print("Incorrect veering cases")
 
 
         # For every section with no continue assume that it will continue going
