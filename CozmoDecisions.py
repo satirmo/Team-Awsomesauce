@@ -33,7 +33,7 @@ class CozmoObstacleCheck:
         self.oldSignList=[('triangle left',100),("triangle right",100),
                             ('square',100),('pentagon left',100),
                             ('pentagon right',100),('octagon',100),
-                            ('circle',100),('cozmo',100)]
+                            ('circle',100)]
 
         # stores all seen signs as a list (for comparison), from Tomas' code
         # Names: "triangle left" "triangle right" "square" "pentagon left"
@@ -107,14 +107,7 @@ class CozmoObstacleCheck:
 
     def interpretSigns(self,cozmoPicture):
         # call Tomas' openCV class to take in his return input of current signs
-        # ----need Tomas' functions to call the signs. Will take 5 pictures,
-        # compare results, and determine what kind of signs are present.
-        #allSignsList=[[ (sign_1, dist_1), (sign_2, dist_2), ..., (sign_n, dist_n) ],(leftDist, rightDist, isBehindCozmo)]
-        # for i in range(5):
-        #     self.allSignsList=[[('triangle left',100),('triangle right',100),
-        #                         ('square',100),('pentagon left',500),
-        #                         ('pentagon right',100),('octagon',1),
-        #                         ('circle',200),('cozmo',100)],(110,91)]
+        # ----need Tomas' functions to call the signs.
 
         # Amanda's file will send the picture to us, and we'll interpret it
         self.allSignsList=[getSignReadings(cozmoPicture),determineLane(cozmoPicture)]
@@ -223,7 +216,7 @@ class CozmoObstacleCheck:
         # statements, so we'll be using if/else
 
         # if no signs are within our distance threshold, then continue
-        if(self.signFocus==0):
+        if(self.signFocus==0 and not self.isCozmo):
             self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
             return self.directionList
 
@@ -238,18 +231,6 @@ class CozmoObstacleCheck:
             # if stop sign is seen first
             elif(self.currentSignList[0][0]=='octagon'):
                 self.directionList=[self.x.STOP_AHEAD,self.currentSignList[0][1],self.veeringDirections]
-
-            # if another Cozmo is infront in same lane, and a stop sign is visible behind
-            elif(self.currentSignList[0][0]=='cozmo' and self.currentSignList[1][0]=='octagon'):
-                # instruct Cozmo to move the distance between the two objects
-                # then stop and rescan until the other object moves
-                self.directionList=[self.x.COZMO_AHEAD_STOP,self.currentSignList[0][1],self.veeringDirections,self.currentSignList[1][1]]
-
-            # if another Cozmo is infront in same lane
-            elif(self.currentSignList[0][0]=='cozmo'):
-                # instruct Cozmo to move the distance between the two objects
-                # then stop and rescan until the other object moves
-                self.directionList=[self.x.COZMO_AHEAD,self.currentSignList[0][1],self.veeringDirections]
 
             # if left turn sign
             elif(self.currentSignList[0][0]=='pentagon left'):
@@ -289,25 +270,5 @@ class CozmoObstacleCheck:
 
             if self.isCozmo :
                 return self.directionList, self.x.COZMO_AHEAD
-            return self.directionList, None
 
-#     # this is a test class that will be nuked as soon as this puppy is
-#     # up and running with the correct logic.
-#     def testThis(self):
-#         self.returnDirections()
-#         print("Ok, tested")
-#         # print(self.allSignsList)
-#         # print(self.currentSignList)
-#         # print(self.veeringDirections)
-#         print(self.directionList)
-#         return self.directionList
-#
-#
-# # temp main used to test the class. Makes sure the directions transfer over.
-# one=CozmoObstacleCheck()
-# ourList=one.testThis()
-# print(ourList)
-# #x=constants.decisions()
-#
-#
-# exit()
+            return self.directionList, None
