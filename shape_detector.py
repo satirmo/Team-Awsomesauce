@@ -118,7 +118,7 @@ def hullToList( hull ) :
 def distanceFromHull( width, shape ) :
     knownWidth, focalLength = distanceConstants[ shape ];
 
-    return knownWidth * focalLength / width;
+    return 25.4 * knownWidth * focalLength / width;
 
 # ------ FIX THIS ------
 # ------ FIX THIS ------
@@ -202,30 +202,44 @@ def getSignReadings( img ) :
 
         if sides == 3 and isValidLeftTriangle( hull ) :
             shape = "triangle left";
+            
+            hull.sort();
             widthHull = getWidthLeftTriangle( hull );
 
         elif sides == 3 and isValidRightTriangle( hull ) :
             shape = "triangle right";
+            
+            hull.sort();
             widthHull = getWidthRightTriangle( hull );
 
         elif sides == 4 and isValidSquare( hull ) :
             shape = "square";
+            
+            hull.sort();
             widthHull = getWidthSquare( hull );
 
         elif sides == 5 and isValidLeftPentagon( hull ) :
             shape = "pentagon left";
+            
+            hull.sort();
             widthHull = getWidthLeftPentagon( hull );
 
         elif sides == 5 and isValidRightPentagon( hull ) :
             shape = "pentagon right";
+            
+            hull.sort();
             widthHull = getWidthRightPentagon( hull );
 
         elif sides == 8 :
             shape = "octagon";
+            
+            hull.sort();
             widthHull = getWidthOctagon( hull );
 
         elif sides >= 15 :
             shape = "circle";
+            
+            hull.sort();
             widthHull = getWidthCircle( hull );
 
         else :
@@ -253,7 +267,7 @@ distanceConstants = {'octagon': (4, 109.5), 'triangle left': (5, 76.799999999999
 if __name__ == "__main__" :
     for i in range( 1, 20 ):
         print( "----------" );
-        name = 'centerRoad' + str(i) + '.png'
+        name = 'BlackSquare10_' + str(i) + '.png'
         img = cv2.imread( name );
 
         signReadings = getSignReadings( img );
