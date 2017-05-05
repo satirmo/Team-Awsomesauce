@@ -28,23 +28,24 @@ def cozmo_program(robot: cozmo.robot.Robot):
         # Info :: function : distance : veering
         info = driver.getInfo()
         decision_maker = info[0]
-        distance_mm = info[1]
+        # distance from camera rather than the front of the car
+        distance = (info[1] + con.COZMO_FRONT)
         veering = info[2]
-        #distance_to_stop = info[3] # Cozmo ahead stop
+        distance_to_stop = info[3] # Cozmo ahead stop
 
 
         if d.TURN_RIGHT == decision_maker:
             # Turn right, this is the wall case
-            driver.roadTurn(decision_maker, distance_mm)
+            driver.roadTurn(decision_maker, distance)
 
         elif d.TURN_LEFT == decision_maker:
             # Turn left, this is the wall case
-            driver.roadTurn(decision_maker, distance_mm)
+            driver.roadTurn(decision_maker, distance)
 
         elif d.TURN_OPTIONAL_LEFT == decision_maker:
             # There is currently an option to turn left
             if driver.getWantTurn() == 1:
-                driver.roadTurn(decision_maker, distance_mm)
+                driver.roadTurn(decision_maker, distance)
             else:
                 continue
 
@@ -52,7 +53,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
             # There is currently an option to turn right
             if driver.getWantTurn() == 1:
                 # 88.9 is the approximation of a lane
-                driver.roadTurn(decision_maker, (distance_mm + road_width))
+                driver.roadTurn(decision_maker, (distance + road_width))
             else:
                 continue
 
@@ -65,9 +66,19 @@ def cozmo_program(robot: cozmo.robot.Robot):
                 driver.roadTurn(direct, (2*road_width + mid_width))
             elif direct == d.TURN_RIGHT:
                 driver.roadTurn(direct, road_width)
+
         elif d.COZMO_AHEAD_STOP == decision_maker:
             # Cozmo is ahead of you possibly stop
-            print("Cozmo ahead stop")
+            driver.setStop(distance)
+            while True:
+                temp = driver.getInfo()
+                if temp[0] != d.COZMO_AHEAD_STOP:
+                    break
+            driver.DriveStraight(distance_to_stop, driver.getSpeedLimit(), False).wait_for_completed()
+            driver.setStop(0)
+            
+
+
 
         elif d.COZMO_AHEAD == decision_maker:
             # Cozmo is ahead, possibly moving

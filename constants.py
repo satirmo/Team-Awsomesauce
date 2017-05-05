@@ -12,6 +12,8 @@ class CONST:
         self.MIN_LIMIT = 40
         self.ROAD_WIDTH = 88.9 # millimeters 3.5 inches
         self.MID_WIDTH = 12.7 # millimeters .5 inches
+        self.COZMO_FRONT = 31.75 # millimeters 1.25
+        self.COZMO_LENGTH = 88.9
 
 class decisions:
     def __init__(self):

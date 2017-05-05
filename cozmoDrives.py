@@ -6,6 +6,7 @@
 # Main Contributor(s) of Section : Amanda Steidl
 # Current File : cozmoDrives.py
 
+import cv2
 import cozmo
 from CozmoDecisions import CozmoObstacleCheck
 from constants import CONST
@@ -30,7 +31,9 @@ class cozmoDrives:
 
         # Instance of Cozmo
         self.robot = a_robot
-
+        self.robot.set_head_angle(degrees(5)).wait_for_completed()
+        self.robot.camera.image_stream_enabled = True
+        self.robot.wait_for(cozmo.world.EvtNewCamerImage)
         # Instance of John's class object.
         self.situationHandler = CozmoObstacleCheck()
 
@@ -55,8 +58,11 @@ class cozmoDrives:
     # This will be information from John Atti
     def getInfo(self):
 
+        #TAKE PICTURE
+        picture = self.robot.world.latest_image.raw_image
+        cv2_image = cv2.cvtColor(numpy.array(picture), cv2.COLOR_RGB2BGR)
         # Function call from John
-        information = self.situationHandler.returnDirections()
+        information = self.situationHandler.returnDirections(picture)
         # Store the information
         # Retrieve the necessary information.
         print("My info ", information)
@@ -85,7 +91,6 @@ class cozmoDrives:
         else:
             self.CurrSpeedLimit = self.MIN_SPEED
             self.setSpeed(self.MIN_SPEED, self.MIN_SPEED)
-
 
     def setStop(self, distance):
         l_wheel_speed = 0.0
