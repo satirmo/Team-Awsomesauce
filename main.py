@@ -21,16 +21,20 @@ def cozmo_program(robot: cozmo.robot.Robot):
     mid_width = con.MID_WIDTH
     driver = cozmoDrives(robot)
     isVeer = 0
+    count = 0
     previousCorrection = None
 
     while True:
         # Cozmo decision making loop. :: always driving straight
         # Info :: function : distance : veering
-        info = driver.getInfo()
+        info, cozmoInFront = driver.getInfo()
         decision_maker = info[0]
         # distance from camera rather than the front of the car
         distance = (info[1] + con.COZMO_FRONT)
         veering = info[2]
+
+        if cozmoInFront == d.COZMO_AHEAD:
+
 
         if d.TURN_RIGHT == decision_maker:
             # Turn right, this is the wall case

@@ -130,7 +130,8 @@ class CozmoObstacleCheck:
 
         # check Neural network for cozmo
         hist = self.cnn.extract_color_histogram(cozmoPicture)
-		result = self.cnn.model.predict( [hist] )[ 0 ]
+		self.isCozmo = self.cnn.model.predict( [hist] )[ 0 ]
+
         return self.currentSignList
 
 
@@ -286,8 +287,9 @@ class CozmoObstacleCheck:
             elif(self.currentSignList[0][0]=='circle'):
                 self.directionList=[self.x.SPEED_UPDATE,0,self.veeringDirections]
 
-
-        return self.directionList, self.isCozmo
+            if self.isCozmo :
+                return self.directionList, self.x.COZMO_AHEAD
+            return self.directionList, None
 
 #     # this is a test class that will be nuked as soon as this puppy is
 #     # up and running with the correct logic.
