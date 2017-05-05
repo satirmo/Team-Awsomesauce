@@ -1,3 +1,11 @@
+# Group Members : John Atti, Mark Bonadies, Tomas Carino, Aayush Shrestha, & Amanda Steidl
+# Project : Final Demo : Cozmo Driving Course
+# Course : CMPS 367 Robotics
+# Professor : Benjamin Fine
+# Date : 05.05.2016
+# Main Contributor(s) of File : John Atti
+# Current File : CozmoDecisions.py
+
 # import random for use in optional turn directions
 import random
 #import constants to help easily translate directions
@@ -20,14 +28,6 @@ class CozmoObstacleCheck:
                             ('pentagon right',100),('octagon',100),
                             ('circle',100),('cozmo',100)]
 
-        # stores sorted sign list. This is going to be a temp variable that will
-        # be used to decide the next movement for Cozmo.
-        self.sortedSigns=[]
-
-        # a list of only the close signs. This is also a temp variable used
-        # to decide the next movement for Cozmo.
-        self.cleanedSigns=[]
-
         # stores all seen signs as a list (for comparison), from Tomas' code
         # Names: "triangle left" "triangle right" "square" "pentagon left"
         #        "pentagon right" "octagon" "circle" "cozmo"
@@ -44,24 +44,12 @@ class CozmoObstacleCheck:
 
         # stores the max distance that an object should be recognized by the Cozmo
         self.DISTANCE_THRESHOLD=60
+        self.highThreshold=130
+        self.lowThreshold=90
 
         # stores the number of signs that need to be focused on
         # based on their distance threshold
         self.signFocus=0
-
-        # stores object closeness as a list
-        # 0 = neutral
-        # 1 = closer
-        # -1 = further away
-        # note: with the group's advancement in openCV, this may not be needed
-        # anymore because we may not
-        self.objectDistance=[0,0,0,0,0,0,0,0,0]
-
-        # result of comparing the 2 sign lists
-        ### comparing the signs within the function should just return the value or the result of the
-        ### comparison rather than store the value. If you feel comfortable storing it make sure
-        ### you don't use the incorrect values within a new comparison later on. --Amanda (hue, hue, hue)
-        self.compareSignList=[]
 
         # directions returned to cozmo. Comes as 2 tuples in a list.
         # tuple 1: adjust wheel to veer the Cozmo (stay in the lines)
@@ -172,8 +160,6 @@ class CozmoObstacleCheck:
         # <=75 for being too close to one of the sides
         # note: CORRECT_LEFT means to go faster on the left wheel
         #       CORRECT_RIGHT means to faster on the right wheel
-        highThreshold=130
-        lowThreshold=90
 
         # if left and right are both between 90 and 140
         if(self.laneDistances[0] >= 85 and self.laneDistances[0] <= 135 and
@@ -182,30 +168,30 @@ class CozmoObstacleCheck:
             self.veeringDirections=self.x.CONTINUE
 
         # if left lane is close
-        elif(self.laneDistances[0] < lowThreshold):
+        elif(self.laneDistances[0] < self.lowThreshold):
             # adjust away from the left (make the number bigger)
             self.veeringDirections=self.x.CORRECT_LEFT
 
         # if left lane is far
-        elif(self.laneDistances[0] >= highThreshold):
+        elif(self.laneDistances[0] >= self.highThreshold):
             # check other lane to see if it's within its threshold.
             # If it's too close, adjust.
-            if(self.laneDistances[1] < lowThreshold):
+            if(self.laneDistances[1] < self.lowThreshold):
             # adjust towards the left (make the number smaller)
                 self.veeringDirections=self.x.CORRECT_RIGHT
             else:
                 self.veeringDirections=self.x.CONTINUE
 
         # if right lane is close
-        elif(self.laneDistances[1] < lowThreshold):
+        elif(self.laneDistances[1] < self.lowThreshold):
             # adjust away from the right (make the number bigger)
             self.veeringDirections=self.x.CORRECT_RIGHT
 
         # if right lane is far
-        elif(self.laneDistances[1] >= highThreshold):
+        elif(self.laneDistances[1] >= self.highThreshold):
             # check other lane to see if it's within its threshold.
             # If it's too close, adjust.
-            if(self.laneDistances[0] < lowThreshold):
+            if(self.laneDistances[0] < self.lowThreshold):
                 self.veeringDirections=(self.x.CORRECT_LEFT)
             # otherwise, continue as normal
             else:
@@ -240,114 +226,102 @@ class CozmoObstacleCheck:
         # essentially a large switch statement. Only Python doesn't do switch
         # statements, so we'll be using if/else
 
+        # if no signs are within our distance threshold, then continue
+        if(self.signFocus==0):
+            self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
+            return self.directionList
+
         # If only 1 sign is noted, return directions for that sign
         # based on comparison and distance
-        if(self.signFocus==1):
+        else:
+
+            # if the sign is too far away, send directions to continue
+            if(self.currentSignList[0][1]>self.DISTANCE_THRESHOLD):
+                self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
+                return self.directionList
 
             # if stop sign is seen first
-            if(self.currentSignList[0][0]=='octagon'):
-                # if within our DISTANCE_THRESHOLD, initiate turn with distance needed
-                if(self.currentSignList[0][1]<self.DISTANCE_THRESHOLD):
-                    self.directionList=[self.x.STOP_AHEAD,self.currentSignList[0][1],self.veeringDirections]
-                    return self.directionList
-                # if outside of our DISTANCE_THRESHOLD, continue as normal and rescan
-                else:
-                    self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
-                    return self.directionList
+            elif(self.currentSignList[0][0]=='octagon'):
+                self.directionList=[self.x.STOP_AHEAD,self.currentSignList[0][1],self.veeringDirections]
+                return self.directionList
+
+            # if another Cozmo is infront in same lane, and a stop sign is visible behind
+            elif(self.currentSignList[0][0]=='cozmo' and self.currentSignList[1][0]=='octagon'):
+                # instruct Cozmo to move the distance between the two objects
+                # then stop and rescan until the other object moves
+                self.directionList=[self.x.COZMO_AHEAD_STOP,self.currentSignList[0][1],self.veeringDirections,self.currentSignList[1][1]]
+                return self.directionList
 
             # if another Cozmo is infront in same lane
             elif(self.currentSignList[0][0]=='cozmo'):
                 # instruct Cozmo to move the distance between the two objects
                 # then stop and rescan until the other object moves
-                self.directionList=[self.x.CONTINUE,self.currentSignList[0][1],self.veeringDirections]
+                self.directionList=[self.x.COZMO_AHEAD,self.currentSignList[0][1],self.veeringDirections]
                 return self.directionList
 
             # if left turn sign
             elif(self.currentSignList[0][0]=='pentagon left'):
-                # if within our DISTANCE_THRESHOLD, initiate turn with distance needed
-                if(self.currentSignList[0][1]<self.DISTANCE_THRESHOLD):
-                    self.directionList=[self.x.TURN_LEFT,self.currentSignList[0][1],self.veeringDirections]
-                    return self.directionList
-                # if outside of DISTANCE_THRESHOLD, continue as normal until within range
-                else:
-                    self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
-                    return self.directionList
+                self.directionList=[self.x.TURN_LEFT,self.currentSignList[0][1],self.veeringDirections]
+                return self.directionList
 
             # if right turn sign
             elif(self.currentSignList[0][0]=='pentagon right'):
-                # if within our DISTANCE_THRESHOLD, initiate turn with distance needed
-                if(self.currentSignList[0][1]<self.DISTANCE_THRESHOLD):
-                    self.directionList=[self.x.TURN_RIGHT,self.currentSignList[0][1],self.veeringDirections]
-                    return self.directionList
-                # if outside of DISTANCE_THRESHOLD, continue as normal until within range
-                else:
-                    self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
-                    return self.directionList
+                self.directionList=[self.x.TURN_RIGHT,self.currentSignList[0][1],self.veeringDirections]
+                return self.directionList
+
             # if optional left turn sign
-            if(0):
+            elif(self.currentSignList[0][0]=='triangle left'):
                 # draw a random number within an if statement to determine turning
                 if(random.randrange(0,2)):
                     #turn left
-                    
-                    pass
+                    self.directionList=[self.x.TURN_LEFT,self.currentSignList[0][1],self.veeringDirections]
+                    return self.directionList
                 else:
                     # stay straight
-                    pass
-                pass
+                    self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
+                    return self.directionList
             # if optional right turn sign
-            if(0):
-                pass
+            elif(self.currentSignList[0][0]=='triangle right'):
                 # draw a random number within an if statement to determine turning
                 if(random.randrange(0,2)):
                     #turn right
-                    pass
+                    self.directionList=[self.x.TURN_RIGHT,self.currentSignList[0][1],self.veeringDirections]
+                    return self.directionList
                 else:
                     # stay straight
-                    pass
-                pass
-            pass
-        # if 2 signs noted, examine the order of the signs and
-        # act on preferences.
+                    self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
+                    return self.directionList
 
-            # if closest sign is a stop sign, stop and then turn
+            # with speed update, a distance of 1 = go faster, and 0 = slower
+            # if speed up
+            elif(self.currentSignList[0][0]=='square'):
+                self.directionList=[self.x.SPEED_UPDATE,1,self.veeringDirections]
+                return self.directionList
 
-                # decide turn direction based on random variable
-
-            # if the 2nd+ sign is a stop sign, identify closer
-            # object and act accordingly
-
-                # if another Cozmo is the closer object,
-                    # tell our Cozmo to drive up to its bumper, based on
-                    # distance recorded, and wait 1 second before scanning again
-
-                # if a speed sign is the closer object
-                    # if the Cozmo is far enough from the stop sign, return
-                    # call to adjust speed
-
-                    # if the Cozmo is close enough to act on the stop sign,
-                    # return call to stop
-
-
+            # if slow down
+            elif(self.currentSignList[0][0]=='circle'):
+                self.directionList=[self.x.SPEED_UPDATE,0,self.veeringDirections]
+                return self.directionList
 
         return self.directionList
 
-    # this is a test class that will be nuked as soon as this puppy is
-    # up and running with the correct logic.
-    def testThis(self):
-        self.returnDirections()
-        print("Ok, tested")
-        # print(self.allSignsList)
-        # print(self.currentSignList)
-        # print(self.veeringDirections)
-        print(self.directionList)
-        return self.directionList
-
-
-# temp main used to test the class. Makes sure the directions transfer over.
-one=CozmoObstacleCheck()
-ourList=one.testThis()
-print(ourList)
-#x=constants.decisions()
-
-
-exit()
+#     # this is a test class that will be nuked as soon as this puppy is
+#     # up and running with the correct logic.
+#     def testThis(self):
+#         self.returnDirections()
+#         print("Ok, tested")
+#         # print(self.allSignsList)
+#         # print(self.currentSignList)
+#         # print(self.veeringDirections)
+#         print(self.directionList)
+#         return self.directionList
+#
+#
+# # temp main used to test the class. Makes sure the directions transfer over.
+# one=CozmoObstacleCheck()
+# ourList=one.testThis()
+# print(ourList)
+# #x=constants.decisions()
+#
+#
+# exit()
