@@ -32,23 +32,17 @@ class cozmoDrives:
 
         # Instance of Cozmo
         self.robot = a_robot
-        print("1")
         self.robot.set_head_angle(degrees(5)).wait_for_completed()
-        print("2")
         self.robot.camera.image_stream_enabled = True
-        print("3")
         self.robot.wait_for(cozmo.world.EvtNewCameraImage)
-        print("4")
+
 
         # Instance of John's class object.
         self.situationHandler = CozmoObstacleCheck()
-        print("5")
 
         # Status variables
         self.stopTurn = randint(self.LEFT, self.RIGHT)
-        print("6")
         self.toTurn = randint(0, 1)
-        print("7")
 
     # Getters
     def getSpeedLimit(self):
@@ -76,7 +70,7 @@ class cozmoDrives:
         else:
             print("No image taken")
         # Function call from John
-        information = self.situationHandler.returnDirections(picture)
+        information = self.situationHandler.returnDirections(cv2_image)
         # Store the information
         # Retrieve the necessary information.
         print("My info ", information)
@@ -84,7 +78,6 @@ class cozmoDrives:
 
     # Setters
     def setSpeed(self, left_wheel, right_wheel):
-        print("HELLLLLOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
         l_wheel_speed = left_wheel
         r_wheel_speed = right_wheel
         l_wheel_acc = l_wheel_speed

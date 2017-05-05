@@ -17,7 +17,6 @@ class CozmoNeuralNet :
 
 		for i in range( 1, 1001 ) :
 			number = str( i );
-			print(i)
 			if i <= 500 :
 				label = True;
 
