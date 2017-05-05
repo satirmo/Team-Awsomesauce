@@ -15,7 +15,7 @@ from numpy import split
 
 def determineLane(image):
 
-    # Height and widtdh of the frame in pixels
+    # Height and width of the frame in pixels
     height, width = image.shape
 
     # Grab lower part of picture to detect lanes on road
