@@ -108,14 +108,14 @@ class CozmoObstacleCheck:
         # ----need Tomas' functions to call the signs. Will take 5 pictures,
         # compare results, and determine what kind of signs are present.
         #allSignsList=[[ (sign_1, dist_1), (sign_2, dist_2), ..., (sign_n, dist_n) ],(leftDist, rightDist, isBehindCozmo)]
-        #for i in range(5):
-            # self.allSignsList=[[('triangle left',100),('triangle right',100),
-            #                     ('square',100),('pentagon left',500),
-            #                     ('pentagon right',100),('octagon',1),
-            #                     ('circle',200),('cozmo',100)],(110,91)]
+        # for i in range(5):
+        #     self.allSignsList=[[('triangle left',100),('triangle right',100),
+        #                         ('square',100),('pentagon left',500),
+        #                         ('pentagon right',100),('octagon',1),
+        #                         ('circle',200),('cozmo',100)],(110,91)]
 
         # Amanda's file will send the picture to us, and we'll interpret it
-        self.allSignsList=[[getSignReadings(cozmoPicture)],determineLane(cozmoPicture)]
+        self.allSignsList=[getSignReadings(cozmoPicture),determineLane(cozmoPicture)]
 
         # run pruneSigns to separate veering from sign design
         self.pruneSigns()
@@ -128,25 +128,6 @@ class CozmoObstacleCheck:
 
         return self.currentSignList
 
-    # may not be needed anymore due to advancements in openCV! WOO!
-    def compareLast(self):
-        # call viewLast to view the last tuple
-        previousDirections=self.viewLast()
-        # if oldSignList has no data, act on
-        # current signs only. Return the current
-        # sign list
-
-        # else (if oldSignList has data)
-        # 1. search through the current sign list
-        #    by sign type and compare the type's distance to the
-        #    old sign list
-        # 2. call objectDistanceUpdate as comparison is run
-        #    to update the sign
-
-        # if a sign distance jumps from within visible threshold to not seen
-        # assume you just passed the sign
-
-        pass
 
     # based on advances in the group's OpenCV knowledge, this method will
     # most likely not be needed
@@ -224,10 +205,6 @@ class CozmoObstacleCheck:
         # run interpretSigns to split Tomas' data into the foundation for
         # veering directions and sign response
         self.interpretSigns(cozmoPicture)
-
-        # run compareLast
-        # note: we may not need to do this anymore due to advancement
-        #       in openCV. Hazaa!
 
         # call storeLast to save old signs
         self.storeLast()
