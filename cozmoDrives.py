@@ -7,7 +7,9 @@
 # Current File : cozmoDrives.py
 
 import cozmo
+from CozmoDecisions import CozmoObstacleCheck
 from constants import CONST
+from constants import decisions
 from random import randint
 from cozmo import event
 from cozmo._clad import _clad_to_engine_iface, _clad_to_engine_cozmo, _clad_to_game_cozmo
@@ -24,28 +26,41 @@ class cozmoDrives:
         self.RIGHT = 1
 
         # Current speed limit :: this will change upon John's information
-        self.speedLimit = 35
+        self.CurrSpeedLimit = 35
 
         # Instance of Cozmo
         self.robot = a_robot
 
         # Instance of John's class object.
-        situationHandler = 0.0
+        self.situationHandler = CozmoObstacleCheck()
 
         # Status variables
         self.stopTurn = randint(self.LEFT, self.RIGHT)
         self.toTurn = randint(0, 1)
 
     # Getters
+    def getSpeedLimit(self):
+        return self.CurrSpeedLimit
 
+    def getWantTurn(self):
+        turn = self.toTurn
+        # Reset variable
+        self.toTurn = randint(0,1)
+        return turn
+
+    def getWhichWay(self):
+        direction = self.stopTurn
+        self.stopTurn = randint(self.LEFT, self.RIGHT)
+        return direction
     # This will be information from John Atti
     def getInfo(self):
 
         # Function call from John
+        information = self.situationHandler.returnDirections()
         # Store the information
         # Retrieve the necessary information.
-        print(" Switch/ If/else deciding what is in front of us.")
-        return -1
+        print("My info ", information)
+        return information
 
     # Setters
     def setSpeed(self, left_wheel, right_wheel):
@@ -65,12 +80,14 @@ class cozmoDrives:
 
     def setNewLimit(self, isFast):
         if isFast:
-            setSpeed(self.MAX_SPEED, self.MIN_SPEED)
+            self.CurrSpeedLimit = self.MAX_SPEED
+            self.setSpeed(self.MAX_SPEED, self.MAX_SPEED)
         else:
-            setSpeed(self.MIN_SPEED, self.MIN_SPEED)
+            self.CurrSpeedLimit = self.MIN_SPEED
+            self.setSpeed(self.MIN_SPEED, self.MIN_SPEED)
 
 
-    def setStop(self):
+    def setStop(self, distance):
         l_wheel_speed = 0.0
         r_wheel_speed = 0.0
         l_wheel_acc = l_wheel_speed
@@ -83,13 +100,41 @@ class cozmoDrives:
         if self.robot.are_wheels_moving:
             print("Error : Wheels are currently moving, should have stopped..!?")
 
+        info = self.getInfo()
+        d = decisions()
+        if d.SPEED_UPDATE == info[0]:
+            if info[1] == 1:
+                self.setNewLimit(True)
+            elif info[1] == 0:
+                self.setNewLimit(False)
+            else:
+                print("Speed update with incorrect value inside cozmoDrives.py :: setStop")
+        return
     # This function will act as an emergency stop with a Cozmo reaction
     def emergencyStop(self):
         print("Cozmo was unprepared to stop suddenly.")
-        self.setStop()
+        self.robot.stop_all_motors()
         self.robot.play_anim_trigger(cozmo.anim.Triggers.FallPlantRoll).wait_for_completed()
 
-    def roadTurn (self, direction):
-        # determine direction
-        print ("Turn in road")
+    def roadTurn (self, direction, distance):
+        turnDirection = decisions()
+
+        # direction as the number within decisions
+        if distance > 0:
+            self.robot.DriveStraight(distance, self.CurrSpeedLimit, False).wait_for_completed()
+        self.robot.stop_all_motors()
+
+        if direction == turnDirection.TURN_LEFT or direction == turnDirection.TURN_OPTIONAL_LEFT:
+            print ("Turning left!")
+            self.robot.TurnInPlace(degrees(-90))
+        elif direction == turnDirection.TURN_RIGHT or direction == turnDirection.TURN_OPTIONAL_RIGHT:
+            print ("Turning right!")
+            self.robot.TurnInPlace(degrees(90))
+        else:
+            print("Error : Decision to turn number ", direction, " not a valid turn.")
         # turn towards that direction
+
+    def
+
+newClass = cozmoDrives()
+newClass.getInfo()

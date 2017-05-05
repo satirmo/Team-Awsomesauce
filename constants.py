@@ -10,6 +10,8 @@ class CONST:
     def __init__ (self):
         self.MAX_LIMIT = 55
         self.MIN_LIMIT = 40
+        self.ROAD_WIDTH = 88.9 # millimeters 3.5 inches
+        self.MID_WIDTH = 12.7 # millimeters .5 inches
 
 class decisions:
     def __init__(self):
