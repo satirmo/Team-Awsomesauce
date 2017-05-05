@@ -14,6 +14,7 @@ import cv2
 #import cozmo
 from shape_detector import *
 import determineLane
+from CozmoNeuralNet import CozmoNeuralNet
 
 # Interpret the signs that Tomas sees
 # pulls from Tomas' openCV class
@@ -26,7 +27,8 @@ class CozmoObstacleCheck:
         # ------- variables
         # imports constants class. Acts as Python enums.
         self.x=constants.decisions()
-
+        self.cnn = CozmoNeuralNet()
+        self.isCozmo = False
         # stores old sign list (for comparison)
         self.oldSignList=[('triangle left',100),("triangle right",100),
                             ('square',100),('pentagon left',100),
@@ -126,6 +128,9 @@ class CozmoObstacleCheck:
         # run cleanSigns to store the number of signs that need to be looked at
         self.cleanSigns()
 
+        # check Neural network for cozmo
+        hist = self.cnn.extract_color_histogram(cozmoPicture)
+		result = self.cnn.model.predict( [hist] )[ 0 ]
         return self.currentSignList
 
 
@@ -282,7 +287,7 @@ class CozmoObstacleCheck:
                 self.directionList=[self.x.SPEED_UPDATE,0,self.veeringDirections]
 
 
-        return self.directionList
+        return self.directionList, self.isCozmo
 
 #     # this is a test class that will be nuked as soon as this puppy is
 #     # up and running with the correct logic.

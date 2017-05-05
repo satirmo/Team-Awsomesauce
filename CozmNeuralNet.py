@@ -24,7 +24,7 @@ class CozmoNeuralNet :
 				label = False;
 
 			# Update path as needed
-			path = "/Training_Data/train" + number + ".png";
+			path = "C:\\Users\Amandas\Desktop\OpenCV\Examples\cozmo-python-sdk\cozmoDrives\Team-Awsomesauce\Training_Data\\train" + number + ".png";
 			image = cv2.imread( path );
 
 			pixels = self.image_to_feature_vector(image)
@@ -81,7 +81,7 @@ if __name__ == "__main__" :
 	cnn = CozmoNeuralNet();
 
 	for i in range( 1, 30 ) :
-		path = "/TestData/test" + str( i ) + ".png";
+		path = "C:\\Users\Amandas\Desktop\OpenCV\Examples\cozmo-python-sdk\cozmoDrives\Team-Awsomesauce\Test Data\\test" + str( i ) + ".png";
 		image = cv2.imread( path );
 
 		hist = cnn.extract_color_histogram(image)
