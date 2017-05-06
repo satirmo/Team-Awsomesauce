@@ -25,12 +25,11 @@ def cozmo_program(robot: cozmo.robot.Robot):
     previousCorrection = None
 
     driver.setSpeed(driver.getSpeedLimit(), driver.getSpeedLimit())
-    test = 1
-    while True:
+
+    while driver.checkBattery():
         # Cozmo decision making loop. :: always driving straight
         # Info :: function : distance : veering
         info, cozmoInFront = driver.getInfo()
-        test += 1
         decision_maker = info[0]
         # distance from camera rather than the front of the car
         distance = (info[1] + con.COZMO_FRONT)
@@ -38,6 +37,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
         veering = info[2][0]
         veering_dist = info[2][1]
 
+        print (decision_maker)
         if cozmoInFront :
             if d.STOP_AHEAD == decision_maker:
                 # Cozmo is ahead of you possibly stop
@@ -70,7 +70,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
                 driver.roadTurn(decision_maker, (distance_ - con.ROAD_WIDTH) + con.MID_WIDTH)
 
             elif d.TURN_LEFT == decision_maker:
-                # print("HAVE TO turn")
+                print("HAVE TO turn")
                 # Turn left, this is the wall case
                 driver.roadTurn(decision_maker, distance_)
 
@@ -124,20 +124,23 @@ def cozmo_program(robot: cozmo.robot.Robot):
             previousCorrection = d.CORRECT_RIGHT
             print("Correct right.")
 
-            driver.setSpeed(driver.getSpeedLimit(), driver.getSpeedLimit() + 2)
+            driver.setSpeed(driver.getSpeedLimit(), driver.getSpeedLimit() + 3.75)
             sleep(0.2)
+            driver.setSpeed(driver.getSpeedLimit() + 1, driver.getSpeedLimit() + 3)
+            sleep(0.1)
 
         elif d.CORRECT_LEFT == veering:
             # Veering correct left
             previousCorrection = d.CORRECT_RIGHT
             print ("Correct left.")
 
-            driver.setSpeed(driver.getSpeedLimit() + 2, driver.getSpeedLimit())
+            driver.setSpeed(driver.getSpeedLimit() + 3.75, driver.getSpeedLimit())
             sleep(0.2)
+            driver.setSpeed(driver.getSpeedLimit() + 3, driver.getSpeedLimit() + 1)
+            sleep(0.1)
 
         else:
             print("Incorrect veering cases")
-
 
         # For every section with no continue assume that it will continue going
         # a certain speed limit.

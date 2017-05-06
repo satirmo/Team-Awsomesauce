@@ -52,7 +52,8 @@ class CozmoObstacleCheck:
         # stores the max distance that an object should be recognized by the Cozmo
         self.DISTANCE_THRESHOLD = 170
         self.DIST_TURNS = 30
-        self.DIST_PADDING = 70 #THIS VALUE IS FOR SQUARES AFTER STOP SIGNS
+        self.DIST_PADDING = 80 #THIS VALUE IS FOR SQUARES AFTER STOP SIGNS
+        self.MAX_THRESHOLD = self.DIST_PADDING + self.DISTANCE_THRESHOLD
 
         # stores the highest distance from a lane allowed before correcting
         self.highThreshold=130
@@ -98,7 +99,7 @@ class CozmoObstacleCheck:
         # signs that need to be considered, without creating a new tuple
         self.signFocus=0
         for i in self.currentSignList:
-            if i[1] < self.DISTANCE_THRESHOLD:
+            if i[1] < self.MAX_THRESHOLD:
                 self.signFocus+=1
         return
 
@@ -152,7 +153,7 @@ class CozmoObstacleCheck:
         # <=75 for being too close to one of the sides
         # note: CORRECT_LEFT means to go faster on the left wheel
         #       CORRECT_RIGHT means to faster on the right where
-        print("VEER \t\t\t", self.laneDistances)
+        # print("VEER \t\t\t", self.laneDistances)
         direction_for_veer = -1
         dist_for_veer = 100
 

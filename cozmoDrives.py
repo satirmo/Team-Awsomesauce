@@ -9,6 +9,7 @@
 import cv2
 import cozmo
 import numpy
+from time import sleep
 from CozmoDecisions import CozmoObstacleCheck
 from constants import CONST
 from constants import decisions
@@ -42,7 +43,7 @@ class cozmoDrives:
 
         # Status variables
         self.stopTurn = randint(self.LEFT, self.RIGHT)
-        self.toTurn = 1
+        self.toTurn = randint(0, 1)
 
     # Getters
     def getSpeedLimit(self):
@@ -102,21 +103,21 @@ class cozmoDrives:
             self.setSpeed(self.MIN_SPEED, self.MIN_SPEED)
 
     def setStop(self, distance):
+        self.robot.stop_all_motors()
         if distance > 0:
-            self.robot.stop_all_motors()
             print("Moving dist ", distance)
             self.robot.drive_straight(distance_mm(distance), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
+            self.robot.stop_all_motors()
 
         if self.robot.are_wheels_moving:
             print("Error : Wheels are currently moving, should have stopped..!?")
 
         info = self.getInfo()
         d = decisions()
-        print(info[0])
-        # sleep(0.5)
 
         while(True):
-            if d.SPEED_UPDATE == info[0]:
+            sleep(0.2)
+            if d.SPEED_UPDATE == info[0][0]:
                 if info[1] == 1:
                     self.setNewLimit(True)
                     break
@@ -126,6 +127,7 @@ class cozmoDrives:
                 else:
                     print("Speed update with incorrect value inside cozmoDrives.py :: setStop")
             info = self.getInfo()
+            print(info)
 
 
         return
@@ -139,23 +141,31 @@ class cozmoDrives:
         turnDirection = decisions()
         print("Distance : ", distance, " Direction : ", direction)
         # direction as the number within decisions
+        self.robot.stop_all_motors()
         if distance > 0:
-            # print("Moving!!")
-            self.robot.stop_all_motors()
+            print("Moving", distance, "  |  ", distance_mm(distance))
             self.robot.drive_straight(distance_mm(distance), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
+            self.robot.stop_all_motors()
 
         if direction == turnDirection.TURN_LEFT or direction == turnDirection.TURN_OPTIONAL_LEFT:
             # print ("Turning left!")
-            self.robot.turn_in_place(degrees(90)).wait_for_completed()
+            self.robot.turn_in_place(degrees(88)).wait_for_completed()
         elif direction == turnDirection.TURN_RIGHT or direction == turnDirection.TURN_OPTIONAL_RIGHT:
             # print ("Turning right!")
-            self.robot.turn_in_place(degrees(-90)).wait_for_completed()
+            self.robot.turn_in_place(degrees(-88)).wait_for_completed()
         else:
             print("Error : Decision to turn number ", direction, " not a valid turn.")
+        self.robot.stop_all_motors()
         # turn towards that direction
-
+        return
 
     def cozmoDriveDistance(self, distance):
         self.robot.drive_straight(distance_mm(distance_to_stop), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
         self.robot.stop_all_motors()
         return
+
+    def checkBattery(self):
+        if self.robot.battery_voltage < 3.6:
+            return False
+        else:
+            return True
