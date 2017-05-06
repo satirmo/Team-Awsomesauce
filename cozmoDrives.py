@@ -38,7 +38,7 @@ class cozmoDrives:
 
 
         # Instance of John's class object.
-        # self.situationHandler = CozmoObstacleCheck()
+        self.situationHandler = CozmoObstacleCheck()
 
         # Status variables
         self.stopTurn = randint(self.LEFT, self.RIGHT)

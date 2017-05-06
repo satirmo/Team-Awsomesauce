@@ -17,7 +17,7 @@ def determineLane(image):
 
     # Height and width of the frame in pixels
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    height, width, channels = image.shape
+    height, width = image.shape
     # print(image.shape)
 
     # Grab lower part of picture to detect lanes on road
@@ -44,7 +44,7 @@ def determineLane(image):
     # cv2.waitKey()
 
     # Gets pixel height and width of the current picture
-    height2, width2, channel2 = output.shape
+    height2, width2 = output.shape
 
     # Splits the picture into a left and right side
     left = output[0:height2, 0:int(width2/2)]

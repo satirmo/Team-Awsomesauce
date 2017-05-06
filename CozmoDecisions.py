@@ -78,6 +78,7 @@ class CozmoObstacleCheck:
         # separates Tomas' openCV variable into veering and sign recognition.
         # note: the sign list will need to be sorted, but veering will not
         self.currentSignList=self.allSignsList[0]
+        print(currentSignList)
         self.laneDistances=self.allSignsList[1]
 
         return
@@ -102,7 +103,7 @@ class CozmoObstacleCheck:
 
     def storeLast(self):
         # store the last set of sign data for comparison
-        self.oldSignList=self.currentSignList
+        self.oldSignList = self.currentSignList
         return
 
     def interpretSigns(self,cozmoPicture):
@@ -155,8 +156,10 @@ class CozmoObstacleCheck:
         # if neither lane can be seen
         elif(self.laneDistances[0] >= 140 and self.laneDistances[0] >= 140):
             # if the last sign was an optional right turn, we'll continue
+            print(self.oldSignList)
+            print(self.oldSignList[0][0])
             if(self.oldSignList[0][0]=='triangle right'):
-                self.veeringDirections=self.x.CORRECT_LEFT
+                self.veeringDirections=self.x.CONTINUE
 
         # if left lane is close
         elif(self.laneDistances[0] < self.lowThreshold):
@@ -206,10 +209,10 @@ class CozmoObstacleCheck:
         self.interpretSigns(cozmoPicture)
 
         # call storeLast to save old signs
-        self.storeLast()
+        self.storeLast() #RIGHT HERE
 
         # check veering status here
-        self.veeringDirections=self.checkVeering()
+        self.veeringDirections=self.checkVeering() #ERROR OCCURED HERE
 
         # Begin analysis to determine next direction list for Cozmo. This is
         # essentially a large switch statement. Only Python doesn't do switch
