@@ -72,8 +72,8 @@ def isValidSquare( hull ) :
     lymid = int( ( hull[ 0 ][ 1 ] + hull[ 1 ][ 1 ] ) / 2 );
     rymid = int( ( hull[ 2 ][ 1 ] + hull[ 3 ][ 1 ] ) / 2 );
 
-    # print( hull );
-    # print( lxmid, rxmid, lymid, rymid );
+    print( hull );
+    print( lxmid, rxmid, lymid, rymid );
 
     dx = abs( lxmid - rxmid );
     dy = abs( lymid - rymid );
@@ -150,6 +150,12 @@ def getWidthRightPentagon( sign ) :
 
     return sign[ 4 ][ 0 ] - lx;
 
+def getWidthHexagon( sign ) :
+    lx = int( ( sign[ 0 ][ 0 ] + sign[ 1 ][ 0 ] ) / 2 );
+    rx = int( ( sign[ 4 ][ 0 ] + sign[ 5 ][ 0 ] ) / 2 );
+
+    return rx - lx;
+
 def getWidthOctagon( sign ) :
     lx = int( ( sign[ 0 ][ 0 ] + sign[ 1 ][ 0 ] ) / 2 );
     rx = int( ( sign[ 6 ][ 0 ] + sign[ 7 ][ 0 ] ) / 2 );
@@ -162,8 +168,6 @@ def getWidthLeftTriangle( sign ) :
     return rx - sign[ 0 ][ 0 ];
 
 def getSignReadings( img ) :
-    # cv2.imshow("supfam", img)
-    # cv2.waitKey()
     # PROCESSING IMAGE
     gray = cv2.cvtColor( img, cv2.COLOR_BGR2GRAY );
 
@@ -204,45 +208,45 @@ def getSignReadings( img ) :
 
         if sides == 3 and isValidLeftTriangle( hull ) :
             shape = "triangle left";
-
+            
             hull.sort();
             widthHull = getWidthLeftTriangle( hull );
 
         elif sides == 3 and isValidRightTriangle( hull ) :
             shape = "triangle right";
-
+            
             hull.sort();
             widthHull = getWidthRightTriangle( hull );
 
         elif sides == 4 and isValidSquare( hull ) :
             shape = "square";
-
+            
             hull.sort();
             widthHull = getWidthSquare( hull );
 
         elif sides == 5 and isValidLeftPentagon( hull ) :
             shape = "pentagon left";
-
+            
             hull.sort();
             widthHull = getWidthLeftPentagon( hull );
 
         elif sides == 5 and isValidRightPentagon( hull ) :
             shape = "pentagon right";
-
+            
             hull.sort();
             widthHull = getWidthRightPentagon( hull );
 
+        elif sides == 6 :
+            shape = "hexagon";
+
+            hull.sort();
+            widthHull = getWidthHexagon();
+
         elif sides == 8 :
             shape = "octagon";
-
+            
             hull.sort();
             widthHull = getWidthOctagon( hull );
-
-        elif sides >= 15 :
-            shape = "circle";
-
-            hull.sort();
-            widthHull = getWidthCircle( hull );
 
         else :
             continue;
@@ -254,6 +258,7 @@ def getSignReadings( img ) :
     # print( signs );
     # cv2.imshow( "text", img );
     # cv2.waitKey();
+
     return signs;
 
 ''' GET COZMO WIDTHS '''
@@ -262,16 +267,16 @@ circle
 cozmo
 '''
 
-distanceConstants = {'octagon': (4, 109.5), 'triangle left': (5, 76.799999999999997), 'triangle right': (5, 75.599999999999994), 'pentagon left': (4, 126.0), 'square': (1, 264.0), 'pentagon right': (4, 123.75)};
+distanceConstants = {'hexagon': (4, 85.5), 'square': (1, 264.0), 'pentagon left': (4, 136.5), 'triangle right': (5, 75.599999999999994), 'pentagon right': (4, 135.0), 'octagon': (4, 109.5), 'triangle left': (5, 76.799999999999997)}
 
 # Driver Code
 if __name__ == "__main__" :
-    for i in range( 1, 20 ):
+    for i in range( 0, 20 ):
         print( "----------" );
-        name = 'BlackSquare10_' + str(i) + '.png'
+        name = 'Hexagon6_' + str(i) + '.png'
         img = cv2.imread( name );
 
         signReadings = getSignReadings( img );
-        print( signReadings );
+        print( signReadings );        
         cv2.imshow( "image", img );
         cv2.waitKey();
