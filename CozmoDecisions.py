@@ -13,7 +13,7 @@ import constants
 import cv2
 #import cozmo
 from shape_detector import *
-import determineLane
+from determineLane import *
 from CozmNeuralNet import CozmoNeuralNet
 
 # Interpret the signs that Tomas sees
@@ -110,7 +110,7 @@ class CozmoObstacleCheck:
         # ----need Tomas' functions to call the signs.
 
         # Amanda's file will send the picture to us, and we'll interpret it
-        self.allSignsList=[getSignReadings(cozmoPicture),determineLane(cozmoPicture)]
+        self.allSignsList = [getSignReadings(cozmoPicture), determineLane(cozmoPicture)]
 
         # run pruneSigns to separate veering from sign design
         self.pruneSigns()

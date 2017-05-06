@@ -25,11 +25,12 @@ def cozmo_program(robot: cozmo.robot.Robot):
     previousCorrection = None
 
     driver.setSpeed(driver.getSpeedLimit(), driver.getSpeedLimit())
-
+    test = 1
     while True:
         # Cozmo decision making loop. :: always driving straight
         # Info :: function : distance : veering
         info, cozmoInFront = driver.getInfo()
+        test += 1
         decision_maker = info[0]
         # distance from camera rather than the front of the car
         distance = (info[1] + con.COZMO_FRONT)

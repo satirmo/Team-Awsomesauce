@@ -38,7 +38,7 @@ class cozmoDrives:
 
 
         # Instance of John's class object.
-        self.situationHandler = CozmoObstacleCheck()
+        # self.situationHandler = CozmoObstacleCheck()
 
         # Status variables
         self.stopTurn = randint(self.LEFT, self.RIGHT)
@@ -70,11 +70,12 @@ class cozmoDrives:
         else:
             print("No image taken")
         # Function call from John
-        information = self.situationHandler.returnDirections(cv2_image)
+        information, cozmostuff = self.situationHandler.returnDirections(cv2_image)
         # Store the information
         # Retrieve the necessary information.
         print("My info ", information)
-        return information
+        return information, cozmostuff
+
 
     # Setters
     def setSpeed(self, left_wheel, right_wheel):
