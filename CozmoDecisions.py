@@ -50,7 +50,9 @@ class CozmoObstacleCheck:
         self.veeringDirections = None
 
         # stores the max distance that an object should be recognized by the Cozmo
-        self.DISTANCE_THRESHOLD=200.0
+        self.DISTANCE_THRESHOLD = 170
+        self.DIST_TURNS = 30
+        self.DIST_PADDING = 70 #THIS VALUE IS FOR SQUARES AFTER STOP SIGNS
 
         # stores the highest distance from a lane allowed before correcting
         self.highThreshold=130
@@ -250,14 +252,6 @@ class CozmoObstacleCheck:
             elif(self.currentSignList[0][0]=='octagon'):
                 self.directionList=[self.x.STOP_AHEAD,self.currentSignList[0][1],self.veeringDirections]
 
-            # if left turn sign
-            elif(self.currentSignList[0][0]=='pentagon left'):
-                self.directionList=[self.x.TURN_LEFT,self.currentSignList[0][1],self.veeringDirections]
-
-            # if right turn sign
-            elif(self.currentSignList[0][0]=='pentagon right'):
-                self.directionList=[self.x.TURN_RIGHT,self.currentSignList[0][1],self.veeringDirections]
-
             # if optional left turn sign
             elif(self.currentSignList[0][0]=='triangle left'):
                 # draw a random number within an if statement to determine turning
@@ -285,6 +279,17 @@ class CozmoObstacleCheck:
             # if slow down
             elif(self.currentSignList[0][0]=='circle'):
                 self.directionList=[self.x.SPEED_UPDATE,0,self.veeringDirections]
+
+            if self.currentSignList[0][0] == 'square' and (self.currentSignList[0][1] < self.DISTANCE_THRESHOLD + self.DIST_PADDING):
+                self.directionList = [self.x.SPEED_UPDATE,1,self.veeringDirections]
+
+            if self.currentSignList[0][1] < self.DISTANCE_THRESHOLD + self.DIST_TURNS:
+                if self.currentSignList[0][0]=='pentagon left':
+                    self.directionList=[self.x.TURN_LEFT,self.currentSignList[0][1],self.veeringDirections]
+                # if right turn sign
+                elif(self.currentSignList[0][0]=='pentagon right'):
+                    self.directionList=[self.x.TURN_RIGHT,self.currentSignList[0][1],self.veeringDirections]
+
 
             if self.isCozmo:
                 return self.directionList, self.x.COZMO_AHEAD

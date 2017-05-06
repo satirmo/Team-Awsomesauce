@@ -102,7 +102,7 @@ class cozmoDrives:
             self.setSpeed(self.MIN_SPEED, self.MIN_SPEED)
 
     def setStop(self, distance):
-        if distance != None:
+        if distance > 0:
             self.robot.stop_all_motors()
             print("Moving dist ", distance)
             self.robot.drive_straight(distance_mm(distance), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
@@ -112,13 +112,22 @@ class cozmoDrives:
 
         info = self.getInfo()
         d = decisions()
-        if d.SPEED_UPDATE == info[0]:
-            if info[1] == 1:
-                self.setNewLimit(True)
-            elif info[1] == 0:
-                self.setNewLimit(False)
-            else:
-                print("Speed update with incorrect value inside cozmoDrives.py :: setStop")
+        print(info[0])
+        # sleep(0.5)
+
+        while(True):
+            if d.SPEED_UPDATE == info[0]:
+                if info[1] == 1:
+                    self.setNewLimit(True)
+                    break
+                elif info[1] == 0:
+                    self.setNewLimit(False)
+                    break
+                else:
+                    print("Speed update with incorrect value inside cozmoDrives.py :: setStop")
+            info = self.getInfo()
+
+
         return
     # This function will act as an emergency stop with a Cozmo reaction
     def emergencyStop(self):

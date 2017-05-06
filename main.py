@@ -67,7 +67,6 @@ def cozmo_program(robot: cozmo.robot.Robot):
             if d.TURN_RIGHT == decision_maker:
                 # print("HAVE TO turn")
                 # Turn right, this is the wall case
-                print(distance_)
                 driver.roadTurn(decision_maker, (distance_ - con.ROAD_WIDTH) + con.MID_WIDTH)
 
             elif d.TURN_LEFT == decision_maker:
@@ -83,7 +82,6 @@ def cozmo_program(robot: cozmo.robot.Robot):
                     continue
 
             elif d.TURN_OPTIONAL_RIGHT == decision_maker:
-                print("OPTIONAL")
                 # There is currently an option to turn right
                 if driver.getWantTurn() == 1:
                     # 88.9 is the approximation of a lane
@@ -93,7 +91,6 @@ def cozmo_program(robot: cozmo.robot.Robot):
 
             elif d.STOP_AHEAD == decision_maker:
                 # There is a stop sign ahead, decide what to do
-                print("STOP SIGN")
                 driver.setStop(distance_)
                 sleep(2)
 
@@ -119,7 +116,6 @@ def cozmo_program(robot: cozmo.robot.Robot):
                     print("should be 0, 1, -1 :: Error within d.SPEED_UPDATE in main.py")
 
         # VEERING SHOULD BE HANDLED ALWAYS
-        print("Veering : ", veering)
         if d.CONTINUE == veering:
             driver.setSpeed(driver.getSpeedLimit(), driver.getSpeedLimit())
 
