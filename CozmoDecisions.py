@@ -77,8 +77,9 @@ class CozmoObstacleCheck:
     def pruneSigns(self):
         # separates Tomas' openCV variable into veering and sign recognition.
         # note: the sign list will need to be sorted, but veering will not
+        # print("ALL SIGNS LIST ", self.allSignsList[0])
         self.currentSignList=self.allSignsList[0]
-        print(currentSignList)
+        # print("current list ", self.currentSignList)
         self.laneDistances=self.allSignsList[1]
 
         return
@@ -103,7 +104,10 @@ class CozmoObstacleCheck:
 
     def storeLast(self):
         # store the last set of sign data for comparison
-        self.oldSignList = self.currentSignList
+        if self.currentSignList != None:
+            self.oldSignList = self.currentSignList
+        else:
+
         return
 
     def interpretSigns(self,cozmoPicture):
@@ -111,7 +115,11 @@ class CozmoObstacleCheck:
         # ----need Tomas' functions to call the signs.
 
         # Amanda's file will send the picture to us, and we'll interpret it
-        self.allSignsList = [getSignReadings(cozmoPicture), determineLane(cozmoPicture)]
+        temp1 = getSignReadings(cozmoPicture)
+        temp2 = determineLane(cozmoPicture)
+        print(temp2)
+        #self.allSignsList = [getSignReadings(cozmoPicture), determineLane(cozmoPicture)]
+        self.allSignsList = [temp1, temp2]
 
         # run pruneSigns to separate veering from sign design
         self.pruneSigns()
@@ -221,8 +229,11 @@ class CozmoObstacleCheck:
         # if no signs are within our distance threshold, then continue
         if(self.signFocus==0 and not self.isCozmo):
             self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
-            return self.directionList
+            return self.directionList, self.isCozmo
 
+        elif self.currentSignList == None:
+            self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
+            return self.directionList, self.isCozmo
         # If only 1 sign is noted, return directions for that sign
         # based on comparison and distance
         else:
@@ -274,4 +285,4 @@ class CozmoObstacleCheck:
             if self.isCozmo:
                 return self.directionList, self.x.COZMO_AHEAD
 
-            return self.directionList, None
+            return self.directionList, False

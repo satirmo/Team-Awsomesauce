@@ -162,6 +162,8 @@ def getWidthLeftTriangle( sign ) :
     return rx - sign[ 0 ][ 0 ];
 
 def getSignReadings( img ) :
+    # cv2.imshow("supfam", img)
+    # cv2.waitKey()
     # PROCESSING IMAGE
     gray = cv2.cvtColor( img, cv2.COLOR_BGR2GRAY );
 
@@ -202,43 +204,43 @@ def getSignReadings( img ) :
 
         if sides == 3 and isValidLeftTriangle( hull ) :
             shape = "triangle left";
-            
+
             hull.sort();
             widthHull = getWidthLeftTriangle( hull );
 
         elif sides == 3 and isValidRightTriangle( hull ) :
             shape = "triangle right";
-            
+
             hull.sort();
             widthHull = getWidthRightTriangle( hull );
 
         elif sides == 4 and isValidSquare( hull ) :
             shape = "square";
-            
+
             hull.sort();
             widthHull = getWidthSquare( hull );
 
         elif sides == 5 and isValidLeftPentagon( hull ) :
             shape = "pentagon left";
-            
+
             hull.sort();
             widthHull = getWidthLeftPentagon( hull );
 
         elif sides == 5 and isValidRightPentagon( hull ) :
             shape = "pentagon right";
-            
+
             hull.sort();
             widthHull = getWidthRightPentagon( hull );
 
         elif sides == 8 :
             shape = "octagon";
-            
+
             hull.sort();
             widthHull = getWidthOctagon( hull );
 
         elif sides >= 15 :
             shape = "circle";
-            
+
             hull.sort();
             widthHull = getWidthCircle( hull );
 
@@ -252,7 +254,7 @@ def getSignReadings( img ) :
     # print( signs );
     # cv2.imshow( "text", img );
     # cv2.waitKey();
-
+    print(signs)
     return signs;
 
 ''' GET COZMO WIDTHS '''
@@ -271,6 +273,6 @@ if __name__ == "__main__" :
         img = cv2.imread( name );
 
         signReadings = getSignReadings( img );
-        print( signReadings );        
+        print( signReadings );
         cv2.imshow( "image", img );
         cv2.waitKey();
