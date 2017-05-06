@@ -150,23 +150,31 @@ class CozmoObstacleCheck:
         # <=75 for being too close to one of the sides
         # note: CORRECT_LEFT means to go faster on the left wheel
         #       CORRECT_RIGHT means to faster on the right where
-        print("VEER ", self.laneDistances)
+        print("VEER \t\t\t", self.laneDistances)
         direction_for_veer = -1
         dist_for_veer = 100
-        # if left and right are both between 90 and 140
+
+        # We're fine in the lane, just return
         if (self.laneDistances[0] >= 85 and self.laneDistances[0] <= 135) and (self.laneDistances[1] >= 85 and self.laneDistances[1] <= 135):
             # return directions for staying on course
             direction_for_veer = self.x.CONTINUE
             dist_for_veer = None
-        # if neither lane can be seen
-        elif self.laneDistances[0] >= 140 and self.laneDistances[0] >= 140:
+            return [direction_for_veer, dist_for_veer]
+
+        # NO MAN'S LAND ::  if neither lane can be seen
+        if self.laneDistances[0] >= 140 and self.laneDistances[1] >= 140:
             # if the last sign was an optional right turn, we'll continue
-            if(self.oldSignList[0][0]=='triangle right'):
+            if self.oldSignList[0][0] == 'triangle right':
                 direction_for_veer = self.x.CONTINUE
                 dist_for_veer = None
+            else:
+                direction_for_veer = self.x.CONTINUE
+                dist_for_veer = None
+            return [direction_for_veer, dist_for_veer]
+
 
         # if left lane is close
-        elif self.laneDistances[0] < self.lowThreshold:
+        if self.laneDistances[0] < self.lowThreshold:
             # adjust away from the left (make the number bigger)
             direction_for_veer = self.x.CORRECT_LEFT
             dist_for_veer = self.laneDistances[0]
@@ -181,28 +189,19 @@ class CozmoObstacleCheck:
         elif self.laneDistances[0] >= self.highThreshold:
             # check other lane to see if it's within its threshold.
             # If it's too close, adjust.
-            if self.laneDistances[1] < self.lowThreshold:
-            # adjust towards the left (make the number smaller)
-                direction_for_veer = self.x.CORRECT_RIGHT
-                dist_for_veer = self.laneDistances[1]
-            else:
-                direction_for_veer = self.x.CONTINUE
-                dist_for_veer = None
+            direction_for_veer = self.x.CORRECT_RIGHT
+            dist_for_veer = self.laneDistances[1]
 
         # if right lane is far
         elif self.laneDistances[1] >= self.highThreshold:
             # check other lane to see if it's within its threshold.
             # If it's too close, adjust.
-            if self.laneDistances[0] < self.lowThreshold:
-                direction_for_veer = self.x.CORRECT_LEFT
-                dist_for_veer = self.laneDistances[0]
-            # otherwise, continue as normal
-            else:
-                direction_for_veer = self.x.CONTINUE
-                dist_for_veer = self.laneDistances[0]
-
+            direction_for_veer = self.x.CORRECT_LEFT
+            dist_for_veer = self.laneDistances[0]
+            
         # if all else fails ...
         else:
+            print("All else failed")
             direction_for_veer = self.x.CONTINUE
             dist_for_veer = None
 

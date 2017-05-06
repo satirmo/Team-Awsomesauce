@@ -72,8 +72,8 @@ def isValidSquare( hull ) :
     lymid = int( ( hull[ 0 ][ 1 ] + hull[ 1 ][ 1 ] ) / 2 );
     rymid = int( ( hull[ 2 ][ 1 ] + hull[ 3 ][ 1 ] ) / 2 );
 
-    print( hull );
-    print( lxmid, rxmid, lymid, rymid );
+    # print( hull );
+    # print( lxmid, rxmid, lymid, rymid );
 
     dx = abs( lxmid - rxmid );
     dy = abs( lymid - rymid );
@@ -254,7 +254,6 @@ def getSignReadings( img ) :
     # print( signs );
     # cv2.imshow( "text", img );
     # cv2.waitKey();
-    print(signs)
     return signs;
 
 ''' GET COZMO WIDTHS '''

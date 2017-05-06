@@ -42,7 +42,7 @@ class cozmoDrives:
 
         # Status variables
         self.stopTurn = randint(self.LEFT, self.RIGHT)
-        self.toTurn = randint(0, 1)
+        self.toTurn = 1
 
     # Getters
     def getSpeedLimit(self):
@@ -91,8 +91,7 @@ class cozmoDrives:
         self.robot.conn.send_msg(msg)
         if self.robot.are_wheels_moving == False:
             print("Error(?) : Speed unchanged / set to zero, please use setStop() instead.")
-        else:
-            print( "Cozmo Message :: Wheel Speed Updated.")
+            # print( "Cozmo Message :: Wheel Speed Updated.")
 
     def setNewLimit(self, isFast):
         if isFast:
