@@ -102,15 +102,11 @@ class cozmoDrives:
             self.setSpeed(self.MIN_SPEED, self.MIN_SPEED)
 
     def setStop(self, distance):
-        l_wheel_speed = 0.0
-        r_wheel_speed = 0.0
-        l_wheel_acc = l_wheel_speed
-        r_wheel_acc = r_wheel_speed
-        msg = _clad_to_engine_iface.DriveWheels(lwheel_speed_mmps=l_wheel_speed,
-                                                rwheel_speed_mmps=r_wheel_speed,
-                                                lwheel_accel_mmps2=l_wheel_acc,
-                                                rwheel_accel_mmps2=r_wheel_acc)
-        self.robot.conn.send_msg(msg)
+        if distance != None:
+            self.robot.stop_all_motors()
+            print("Moving dist ", distance)
+            self.robot.drive_straight(distance_mm(distance), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
+
         if self.robot.are_wheels_moving:
             print("Error : Wheels are currently moving, should have stopped..!?")
 
@@ -135,19 +131,20 @@ class cozmoDrives:
         print("Distance : ", distance, " Direction : ", direction)
         # direction as the number within decisions
         if distance > 0:
-            print("Moving!!")
+            # print("Moving!!")
             self.robot.stop_all_motors()
             self.robot.drive_straight(distance_mm(distance), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
 
         if direction == turnDirection.TURN_LEFT or direction == turnDirection.TURN_OPTIONAL_LEFT:
-            print ("Turning left!")
+            # print ("Turning left!")
             self.robot.turn_in_place(degrees(90)).wait_for_completed()
         elif direction == turnDirection.TURN_RIGHT or direction == turnDirection.TURN_OPTIONAL_RIGHT:
-            print ("Turning right!")
+            # print ("Turning right!")
             self.robot.turn_in_place(degrees(-90)).wait_for_completed()
         else:
             print("Error : Decision to turn number ", direction, " not a valid turn.")
         # turn towards that direction
+
 
     def cozmoDriveDistance(self, distance):
         self.robot.drive_straight(distance_mm(distance_to_stop), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()

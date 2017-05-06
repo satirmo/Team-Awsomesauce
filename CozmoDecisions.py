@@ -50,13 +50,13 @@ class CozmoObstacleCheck:
         self.veeringDirections = None
 
         # stores the max distance that an object should be recognized by the Cozmo
-        self.DISTANCE_THRESHOLD=152.4
+        self.DISTANCE_THRESHOLD=200.0
 
         # stores the highest distance from a lane allowed before correcting
         self.highThreshold=130
 
         # stores the lowest distance from a lane allowed before correcting
-        self.lowThreshold=90
+        self.lowThreshold=95
 
         # stores the number of signs that need to be focused on
         # based on their distance threshold
@@ -155,7 +155,7 @@ class CozmoObstacleCheck:
         dist_for_veer = 100
 
         # We're fine in the lane, just return
-        if (self.laneDistances[0] >= 85 and self.laneDistances[0] <= 135) and (self.laneDistances[1] >= 85 and self.laneDistances[1] <= 135):
+        if (self.laneDistances[0] >= self.lowThreshold + 5 and self.laneDistances[0] <= self.highThreshold - 5) and (self.laneDistances[1] >= self.lowThreshold + 5 and self.laneDistances[1] <= self.highThreshold - 5):
             # return directions for staying on course
             direction_for_veer = self.x.CONTINUE
             dist_for_veer = None
@@ -198,7 +198,7 @@ class CozmoObstacleCheck:
             # If it's too close, adjust.
             direction_for_veer = self.x.CORRECT_LEFT
             dist_for_veer = self.laneDistances[0]
-            
+
         # if all else fails ...
         else:
             print("All else failed")
@@ -263,7 +263,7 @@ class CozmoObstacleCheck:
                 # draw a random number within an if statement to determine turning
                 if(random.randrange(0,2)):
                     #turn left
-                    self.directionList=[self.x.TURN_LEFT,self.currentSignList[0][1],self.veeringDirections]
+                    self.directionList=[self.x.TURN_OPTIONAL_LEFT,self.currentSignList[0][1],self.veeringDirections]
                 else:
                     # stay straight
                     self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
@@ -272,7 +272,7 @@ class CozmoObstacleCheck:
                 # draw a random number within an if statement to determine turning
                 if(random.randrange(0,2)):
                     #turn right
-                    self.directionList=[self.x.TURN_RIGHT,self.currentSignList[0][1],self.veeringDirections]
+                    self.directionList=[self.x.TURN_OPTIONAL_RIGHT,self.currentSignList[0][1],self.veeringDirections]
                 else:
                     # stay straight
                     self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]

@@ -27,7 +27,6 @@ def cozmo_program(robot: cozmo.robot.Robot):
     driver.setSpeed(driver.getSpeedLimit(), driver.getSpeedLimit())
     test = 1
     while True:
-        sleep(0.5)
         # Cozmo decision making loop. :: always driving straight
         # Info :: function : distance : veering
         info, cozmoInFront = driver.getInfo()
@@ -66,39 +65,46 @@ def cozmo_program(robot: cozmo.robot.Robot):
                     continue
         else:
             if d.TURN_RIGHT == decision_maker:
-                print("HAVE TO turn")
+                # print("HAVE TO turn")
                 # Turn right, this is the wall case
-                driver.roadTurn(decision_maker, (distance_ - con.ROAD_WIDTH ))
+                print(distance_)
+                driver.roadTurn(decision_maker, (distance_ - con.ROAD_WIDTH) + con.MID_WIDTH)
 
             elif d.TURN_LEFT == decision_maker:
-                print("HAVE TO turn")
+                # print("HAVE TO turn")
                 # Turn left, this is the wall case
                 driver.roadTurn(decision_maker, distance_)
 
             elif d.TURN_OPTIONAL_LEFT == decision_maker:
                 # There is currently an option to turn left
                 if driver.getWantTurn() == 1:
-                    driver.roadTurn(decision_maker, distance)
+                    driver.roadTurn(decision_maker, distance_ - (0.5*road_width))
                 else:
                     continue
 
             elif d.TURN_OPTIONAL_RIGHT == decision_maker:
+                print("OPTIONAL")
                 # There is currently an option to turn right
                 if driver.getWantTurn() == 1:
                     # 88.9 is the approximation of a lane
-                    driver.roadTurn(decision_maker, (distance + road_width))
+                    driver.roadTurn(decision_maker, (distance + 0.5 * road_width) + con.MID_WIDTH)
                 else:
                     continue
 
             elif d.STOP_AHEAD == decision_maker:
                 # There is a stop sign ahead, decide what to do
-                driver.setStop(distance)
+                print("STOP SIGN")
+                driver.setStop(distance_)
+                sleep(2)
+
+                ##   CHECK FOR COZMO
+
                 direct = driver.getWhichWay()
                 # Make a turn using the turn options!
                 if direct == d.TURN_LEFT:
                     driver.roadTurn(direct, (2*road_width + mid_width))
                 elif direct == d.TURN_RIGHT:
-                    driver.roadTurn(direct, road_width)
+                    driver.roadTurn(direct, road_width + mid_width)
 
             elif d.SPEED_UPDATE == decision_maker:
                 # Update the speed to a new traffic pattern
@@ -123,7 +129,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
             print("Correct right.")
 
             driver.setSpeed(driver.getSpeedLimit(), driver.getSpeedLimit() + 2)
-            continue
+            sleep(0.2)
 
         elif d.CORRECT_LEFT == veering:
             # Veering correct left
@@ -131,7 +137,8 @@ def cozmo_program(robot: cozmo.robot.Robot):
             print ("Correct left.")
 
             driver.setSpeed(driver.getSpeedLimit() + 2, driver.getSpeedLimit())
-            continue
+            sleep(0.2)
+
         else:
             print("Incorrect veering cases")
 
