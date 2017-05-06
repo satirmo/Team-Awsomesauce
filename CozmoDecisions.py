@@ -56,10 +56,10 @@ class CozmoObstacleCheck:
         self.MAX_THRESHOLD = self.DIST_PADDING + self.DISTANCE_THRESHOLD
 
         # stores the highest distance from a lane allowed before correcting
-        self.highThreshold=130
+        self.highThreshold =130
 
         # stores the lowest distance from a lane allowed before correcting
-        self.lowThreshold=95
+        self.lowThreshold = 75
 
         # stores the number of signs that need to be focused on
         # based on their distance threshold
@@ -156,7 +156,7 @@ class CozmoObstacleCheck:
         # print("VEER \t\t\t", self.laneDistances)
         direction_for_veer = -1
         dist_for_veer = 100
-
+        print ("LANE DISTANCE : ", self.laneDistances)
         # We're fine in the lane, just return
         if (self.laneDistances[0] >= self.lowThreshold + 5 and self.laneDistances[0] <= self.highThreshold - 5) and (self.laneDistances[1] >= self.lowThreshold + 5 and self.laneDistances[1] <= self.highThreshold - 5):
             # return directions for staying on course

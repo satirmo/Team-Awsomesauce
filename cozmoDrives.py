@@ -106,7 +106,10 @@ class cozmoDrives:
         self.robot.stop_all_motors()
         if distance > 0:
             print("Moving dist ", distance)
-            self.robot.drive_straight(distance_mm(distance), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
+            # self.robot.drive_straight(distance_mm(distance), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
+            time = (distance / self.CurrSpeedLimit)
+            self.setSpeed(self.CurrSpeedLimit, self.CurrSpeedLimit)
+            sleep(time)
             self.robot.stop_all_motors()
 
         if self.robot.are_wheels_moving:
@@ -144,7 +147,10 @@ class cozmoDrives:
         self.robot.stop_all_motors()
         if distance > 0:
             print("Moving", distance, "  |  ", distance_mm(distance))
-            self.robot.drive_straight(distance_mm(distance), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
+            time = (distance / self.CurrSpeedLimit)
+            self.setSpeed(self.CurrSpeedLimit, self.CurrSpeedLimit)
+            sleep(time)
+            # print(self.robot.drive_straight(distance_mm(distance), speed_mmps(self.CurrSpeedLimit), False, False, 1).wait_for_completed())
             self.robot.stop_all_motors()
 
         if direction == turnDirection.TURN_LEFT or direction == turnDirection.TURN_OPTIONAL_LEFT:
@@ -155,12 +161,15 @@ class cozmoDrives:
             self.robot.turn_in_place(degrees(-88)).wait_for_completed()
         else:
             print("Error : Decision to turn number ", direction, " not a valid turn.")
-        self.robot.stop_all_motors()
+
         # turn towards that direction
         return
 
     def cozmoDriveDistance(self, distance):
-        self.robot.drive_straight(distance_mm(distance_to_stop), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
+        # self.robot.drive_straight(distance_mm(distance_to_stop), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
+        time = (distance / self.CurrSpeedLimit)
+        self.setSpeed(self.CurrSpeedLimit, self.CurrSpeedLimit)
+        sleep(time)
         self.robot.stop_all_motors()
         return
 

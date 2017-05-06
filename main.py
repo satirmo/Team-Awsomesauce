@@ -37,7 +37,8 @@ def cozmo_program(robot: cozmo.robot.Robot):
         veering = info[2][0]
         veering_dist = info[2][1]
 
-        print (decision_maker)
+
+        # print (decision_maker)
         if cozmoInFront :
             if d.STOP_AHEAD == decision_maker:
                 # Cozmo is ahead of you possibly stop
@@ -76,12 +77,14 @@ def cozmo_program(robot: cozmo.robot.Robot):
 
             elif d.TURN_OPTIONAL_LEFT == decision_maker:
                 # There is currently an option to turn left
+                print("OPTIONAL")
                 if driver.getWantTurn() == 1:
                     driver.roadTurn(decision_maker, distance_ - (0.5*road_width))
                 else:
                     continue
 
             elif d.TURN_OPTIONAL_RIGHT == decision_maker:
+                print("OPTIONAL")
                 # There is currently an option to turn right
                 if driver.getWantTurn() == 1:
                     # 88.9 is the approximation of a lane
@@ -122,28 +125,25 @@ def cozmo_program(robot: cozmo.robot.Robot):
         elif d.CORRECT_RIGHT == veering:
             # Veering correct right, meaning speed up right
             previousCorrection = d.CORRECT_RIGHT
-            print("Correct right.")
-
+            print("Correct right.", veering_dist)
             driver.setSpeed(driver.getSpeedLimit(), driver.getSpeedLimit() + 3.75)
-            sleep(0.2)
-            driver.setSpeed(driver.getSpeedLimit() + 1, driver.getSpeedLimit() + 3)
-            sleep(0.1)
+            sleep(0.3)
+            driver.setSpeed(driver.getSpeedLimit(), driver.getSpeedLimit() + 2.0)
 
         elif d.CORRECT_LEFT == veering:
             # Veering correct left
             previousCorrection = d.CORRECT_RIGHT
-            print ("Correct left.")
+            print ("Correct left.", veering_dist)
 
             driver.setSpeed(driver.getSpeedLimit() + 3.75, driver.getSpeedLimit())
-            sleep(0.2)
-            driver.setSpeed(driver.getSpeedLimit() + 3, driver.getSpeedLimit() + 1)
-            sleep(0.1)
+            sleep(0.3)
+            driver.setSpeed(driver.getSpeedLimit() + 2.0, driver.getSpeedLimit())
 
         else:
-            print("Incorrect veering cases")
+            driver.setSpeed(driver.getSpeedLimit(), driver.getSpeedLimit())
 
         # For every section with no continue assume that it will continue going
         # a certain speed limit.
-        driver.setSpeed(driver.getSpeedLimit(), driver.getSpeedLimit())
+
 
 cozmo.run_program(cozmo_program)
