@@ -73,12 +73,13 @@ class cozmoDrives:
         information, cozmostuff = self.situationHandler.returnDirections(cv2_image)
         # Store the information
         # Retrieve the necessary information.
-        print("My info ", information)
+        # print("My info ", information)
         return information, cozmostuff
 
 
     # Setters
     def setSpeed(self, left_wheel, right_wheel):
+        print("Speed set to ", left_wheel, " | ", right_wheel)
         l_wheel_speed = left_wheel
         r_wheel_speed = right_wheel
         l_wheel_acc = l_wheel_speed
@@ -132,23 +133,24 @@ class cozmoDrives:
 
     def roadTurn (self, direction, distance):
         turnDirection = decisions()
-
+        print("Distance : ", distance, " Direction : ", direction)
         # direction as the number within decisions
         if distance > 0:
-            self.robot.DriveStraight(distance, self.CurrSpeedLimit, False).wait_for_completed()
-        self.robot.stop_all_motors()
+            print("Moving!!")
+            self.robot.stop_all_motors()
+            self.robot.drive_straight(distance_mm(distance), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
 
         if direction == turnDirection.TURN_LEFT or direction == turnDirection.TURN_OPTIONAL_LEFT:
             print ("Turning left!")
-            self.robot.TurnInPlace(degrees(-90))
+            self.robot.turn_in_place(degrees(90)).wait_for_completed()
         elif direction == turnDirection.TURN_RIGHT or direction == turnDirection.TURN_OPTIONAL_RIGHT:
             print ("Turning right!")
-            self.robot.TurnInPlace(degrees(90))
+            self.robot.turn_in_place(degrees(-90)).wait_for_completed()
         else:
             print("Error : Decision to turn number ", direction, " not a valid turn.")
         # turn towards that direction
 
     def cozmoDriveDistance(self, distance):
-        self.robot.DriveStraight(distance_to_stop, driver.getSpeedLimit(), False).wait_for_completed()
+        self.robot.drive_straight(distance_mm(distance_to_stop), speed_mmps(self.CurrSpeedLimit), False).wait_for_completed()
         self.robot.stop_all_motors()
         return

@@ -15,9 +15,9 @@ class CozmoNeuralNet :
 		features = []
 		labels = []
 
-		for i in range( 1, 1001 ) :
+		for i in range( 1, 1001 ) : #1001
 			number = str( i );
-			if i <= 500 :
+			if i <= 500 : #500
 				label = True;
 
 			else :

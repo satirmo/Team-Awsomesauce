@@ -27,9 +27,7 @@ class CozmoObstacleCheck:
         # ------- variables
         # imports constants class. Acts as Python enums.
         self.x=constants.decisions()
-        print("J1")
-        self.cnn = CozmoNeuralNet()
-        print("J2")
+        # self.cnn = CozmoNeuralNet()
         self.isCozmo = False
         # stores old sign list (for comparison)
         self.oldSignList=[('triangle left',100),("triangle right",100),
@@ -49,10 +47,10 @@ class CozmoObstacleCheck:
         self.laneDistances=(110,91)
 
         # stores directions for veering
-        self.veeringDirections=11
+        self.veeringDirections = None
 
         # stores the max distance that an object should be recognized by the Cozmo
-        self.DISTANCE_THRESHOLD=60
+        self.DISTANCE_THRESHOLD=152.4
 
         # stores the highest distance from a lane allowed before correcting
         self.highThreshold=130
@@ -77,9 +75,9 @@ class CozmoObstacleCheck:
     def pruneSigns(self):
         # separates Tomas' openCV variable into veering and sign recognition.
         # note: the sign list will need to be sorted, but veering will not
-        # print("ALL SIGNS LIST ", self.allSignsList[0])
+
         self.currentSignList=self.allSignsList[0]
-        # print("current list ", self.currentSignList)
+
         self.laneDistances=self.allSignsList[1]
 
         return
@@ -104,9 +102,8 @@ class CozmoObstacleCheck:
 
     def storeLast(self):
         # store the last set of sign data for comparison
-        if self.currentSignList != None:
+        if self.currentSignList:
             self.oldSignList = self.currentSignList
-        else:
 
         return
 
@@ -117,7 +114,6 @@ class CozmoObstacleCheck:
         # Amanda's file will send the picture to us, and we'll interpret it
         temp1 = getSignReadings(cozmoPicture)
         temp2 = determineLane(cozmoPicture)
-        print(temp2)
         #self.allSignsList = [getSignReadings(cozmoPicture), determineLane(cozmoPicture)]
         self.allSignsList = [temp1, temp2]
 
@@ -131,8 +127,8 @@ class CozmoObstacleCheck:
         self.cleanSigns()
 
         # check Neural network for cozmo
-        hist = self.cnn.extract_color_histogram(cozmoPicture)
-        self.isCozmo = self.cnn.model.predict([hist])[0]
+        # hist = self.cnn.extract_color_histogram(cozmoPicture)
+        # self.isCozmo = self.cnn.model.predict([hist])[0]
 
         return self.currentSignList
 
@@ -153,56 +149,64 @@ class CozmoObstacleCheck:
         # >=159 for being too far from one of the sides, and
         # <=75 for being too close to one of the sides
         # note: CORRECT_LEFT means to go faster on the left wheel
-        #       CORRECT_RIGHT means to faster on the right wheel
-
+        #       CORRECT_RIGHT means to faster on the right where
+        print("VEER ", self.laneDistances)
+        direction_for_veer = -1
+        dist_for_veer = 100
         # if left and right are both between 90 and 140
-        if(self.laneDistances[0] >= 85 and self.laneDistances[0] <= 135 and
-            self.laneDistances[1] >= 85 and self.laneDistances[1] <= 135):
+        if (self.laneDistances[0] >= 85 and self.laneDistances[0] <= 135) and (self.laneDistances[1] >= 85 and self.laneDistances[1] <= 135):
             # return directions for staying on course
-            self.veeringDirections=self.x.CONTINUE
-
+            direction_for_veer = self.x.CONTINUE
+            dist_for_veer = None
         # if neither lane can be seen
-        elif(self.laneDistances[0] >= 140 and self.laneDistances[0] >= 140):
+        elif self.laneDistances[0] >= 140 and self.laneDistances[0] >= 140:
             # if the last sign was an optional right turn, we'll continue
-            print(self.oldSignList)
-            print(self.oldSignList[0][0])
             if(self.oldSignList[0][0]=='triangle right'):
-                self.veeringDirections=self.x.CONTINUE
+                direction_for_veer = self.x.CONTINUE
+                dist_for_veer = None
 
         # if left lane is close
-        elif(self.laneDistances[0] < self.lowThreshold):
+        elif self.laneDistances[0] < self.lowThreshold:
             # adjust away from the left (make the number bigger)
-            self.veeringDirections=self.x.CORRECT_LEFT
-
-        # if left lane is far
-        elif(self.laneDistances[0] >= self.highThreshold):
-            # check other lane to see if it's within its threshold.
-            # If it's too close, adjust.
-            if(self.laneDistances[1] < self.lowThreshold):
-            # adjust towards the left (make the number smaller)
-                self.veeringDirections=self.x.CORRECT_RIGHT
-            else:
-                self.veeringDirections=self.x.CONTINUE
+            direction_for_veer = self.x.CORRECT_LEFT
+            dist_for_veer = self.laneDistances[0]
 
         # if right lane is close
-        elif(self.laneDistances[1] < self.lowThreshold):
+        elif self.laneDistances[1] < self.lowThreshold:
             # adjust away from the right (make the number bigger)
-            self.veeringDirections=self.x.CORRECT_RIGHT
+            direction_for_veer = self.x.CORRECT_RIGHT
+            dist_for_veer = self.laneDistances[1]
 
-        # if right lane is far
-        elif(self.laneDistances[1] >= self.highThreshold):
+        # if left lane is far
+        elif self.laneDistances[0] >= self.highThreshold:
             # check other lane to see if it's within its threshold.
             # If it's too close, adjust.
-            if(self.laneDistances[0] < self.lowThreshold):
-                self.veeringDirections=(self.x.CORRECT_LEFT)
+            if self.laneDistances[1] < self.lowThreshold:
+            # adjust towards the left (make the number smaller)
+                direction_for_veer = self.x.CORRECT_RIGHT
+                dist_for_veer = self.laneDistances[1]
+            else:
+                direction_for_veer = self.x.CONTINUE
+                dist_for_veer = None
+
+        # if right lane is far
+        elif self.laneDistances[1] >= self.highThreshold:
+            # check other lane to see if it's within its threshold.
+            # If it's too close, adjust.
+            if self.laneDistances[0] < self.lowThreshold:
+                direction_for_veer = self.x.CORRECT_LEFT
+                dist_for_veer = self.laneDistances[0]
             # otherwise, continue as normal
             else:
-                self.veeringDirections=(self.x.CONTINUE)
+                direction_for_veer = self.x.CONTINUE
+                dist_for_veer = self.laneDistances[0]
 
         # if all else fails ...
         else:
-            self.veeringDirections=(self.x.CONTINUE)
-        return self.veeringDirections
+            direction_for_veer = self.x.CONTINUE
+            dist_for_veer = None
+
+        return [direction_for_veer, dist_for_veer]
 
     # this is the main function of the class
     # it calls all the other functions and
@@ -226,14 +230,15 @@ class CozmoObstacleCheck:
         # essentially a large switch statement. Only Python doesn't do switch
         # statements, so we'll be using if/else
 
-        # if no signs are within our distance threshold, then continue
-        if(self.signFocus==0 and not self.isCozmo):
+        if not self.currentSignList:
             self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
             return self.directionList, self.isCozmo
 
-        elif self.currentSignList == None:
+        # if no signs are within our distance threshold, then continue
+        if(self.signFocus==0 and not self.isCozmo):
             self.directionList=[self.x.CONTINUE,-1,self.veeringDirections]
-            return self.directionList, self.isCozmo
+            return self.directionList, False
+
         # If only 1 sign is noted, return directions for that sign
         # based on comparison and distance
         else:
