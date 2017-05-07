@@ -1,3 +1,11 @@
+# Group Members : John Atti, Mark Bonadies, Tomas Carino, Aayush Shrestha, & Amanda Steidl
+# Project : Final Demo : Cozmo Driving Course
+# Course : CMPS 367 Robotics
+# Professor : Benjamin Fine
+# Date : 05.01.2016
+# Main Contributor(s) of File : Tomas Carino
+# Current File : cozmoNeuralNetwork.py
+
 from numpy._distributor_init import NUMPY_MKL
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cross_validation import train_test_split
