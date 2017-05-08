@@ -69,9 +69,6 @@ def isValidSquare( hull ) :
     lymid = int( ( hull[ 0 ][ 1 ] + hull[ 1 ][ 1 ] ) / 2 );
     rymid = int( ( hull[ 2 ][ 1 ] + hull[ 3 ][ 1 ] ) / 2 );
 
-    print( hull );
-    print( lxmid, rxmid, lymid, rymid );
-
     dx = abs( lxmid - rxmid );
     dy = abs( lymid - rymid );
 
@@ -161,7 +158,7 @@ def getWidthOctagon( sign ) :
     return rx - lx;
 
 # Find the distance to all valid signs in the image using noise reduction methods,
-# Convex Hull generation, Euclidean Geometry, and the Triangle Similarity Theorem
+# Convex Hull generation, Euclidean Geometry, and the Pinhole Camera Model
 def getSignReadings( img ) :
     # Reduce noise in the image
     gray = cv2.cvtColor( img, cv2.COLOR_BGR2GRAY );
